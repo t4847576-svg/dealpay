@@ -73,7 +73,7 @@
           <button onclick="logout()" class="text-xs text-gray-400 hover:text-red-400"><i class="fa-solid fa-right-from-bracket"></i></button>
         </div>
 
-        <button onclick="showSection('seller')" class="bg-brand-500 hover:bg-brand-600 text-slate-950 font-semibold px-4 py-2 rounded-lg text-sm transition shadow-lg shadow-emerald-500/20">
+        <button onclick="openCreateModal()" class="bg-brand-500 hover:bg-brand-600 text-slate-950 font-semibold px-4 py-2 rounded-lg text-sm transition shadow-lg shadow-emerald-500/20">
           <i class="fa-solid fa-plus mr-1"></i> Продати
         </button>
       </div>
@@ -89,7 +89,7 @@
         <div class="absolute -top-24 -right-24 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl"></div>
         <div class="relative z-10 max-w-2xl">
           <span class="bg-brand-500/10 text-brand-500 text-xs font-semibold px-3 py-1 rounded-full border border-brand-500/20 mb-4 inline-block">
-            🛡️ Безпечні угоди Safe-Escrow
+            🛡️ Безпечні угоди Safe-Escrow (Комісія лише 3%)
           </span>
           <h1 class="text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4">
             Головний український цифровий маркетплейс
@@ -101,7 +101,7 @@
             <button onclick="showSection('catalog')" class="bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold px-6 py-3 rounded-xl transition shadow-lg shadow-emerald-500/20">
               Перейти до каталогу
             </button>
-            <button onclick="showSection('seller')" class="bg-slate-900 hover:bg-slate-800 text-gray-200 font-semibold px-6 py-3 rounded-xl border border-gray-700 transition">
+            <button onclick="openCreateModal()" class="bg-slate-900 hover:bg-slate-800 text-gray-200 font-semibold px-6 py-3 rounded-xl border border-gray-700 transition">
               Почати продавати
             </button>
           </div>
@@ -112,33 +112,27 @@
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-12">
         <div onclick="showSection('catalog')" class="glass-card p-4 rounded-xl hover:border-brand-500/50 cursor-pointer transition text-center group">
           <i class="fa-solid fa-gamepad text-2xl text-brand-500 mb-2 group-hover:scale-110 transition-transform"></i>
-          <p class="text-sm font-medium text-gray-200">CS2 & Буст</p>
-          <span class="text-xs text-gray-500">1,240 лотів</span>
+          <p class="text-sm font-medium text-gray-200">CS2 Services</p>
         </div>
         <div onclick="showSection('catalog')" class="glass-card p-4 rounded-xl hover:border-brand-500/50 cursor-pointer transition text-center group">
           <i class="fa-brands fa-telegram text-2xl text-brand-accent mb-2 group-hover:scale-110 transition-transform"></i>
-          <p class="text-sm font-medium text-gray-200">Telegram Боти</p>
-          <span class="text-xs text-gray-500">580 лотів</span>
+          <p class="text-sm font-medium text-gray-200">Telegram</p>
+        </div>
+        <div onclick="showSection('catalog')" class="glass-card p-4 rounded-xl hover:border-brand-500/50 cursor-pointer transition text-center group">
+          <i class="fa-solid fa-palette text-2xl text-purple-400 mb-2 group-hover:scale-110 transition-transform"></i>
+          <p class="text-sm font-medium text-gray-200">Design</p>
         </div>
         <div onclick="showSection('catalog')" class="glass-card p-4 rounded-xl hover:border-brand-500/50 cursor-pointer transition text-center group">
           <i class="fa-solid fa-cubes text-2xl text-emerald-400 mb-2 group-hover:scale-110 transition-transform"></i>
           <p class="text-sm font-medium text-gray-200">Minecraft</p>
-          <span class="text-xs text-gray-500">890 лотів</span>
-        </div>
-        <div onclick="showSection('catalog')" class="glass-card p-4 rounded-xl hover:border-brand-500/50 cursor-pointer transition text-center group">
-          <i class="fa-solid fa-palette text-2xl text-purple-400 mb-2 group-hover:scale-110 transition-transform"></i>
-          <p class="text-sm font-medium text-gray-200">Дизайн & Превью</p>
-          <span class="text-xs text-gray-500">410 лотів</span>
         </div>
         <div onclick="showSection('catalog')" class="glass-card p-4 rounded-xl hover:border-brand-500/50 cursor-pointer transition text-center group">
           <i class="fa-solid fa-code text-2xl text-amber-400 mb-2 group-hover:scale-110 transition-transform"></i>
-          <p class="text-sm font-medium text-gray-200">Веб-розробка</p>
-          <span class="text-xs text-gray-500">320 лотів</span>
+          <p class="text-sm font-medium text-gray-200">Розробка</p>
         </div>
         <div onclick="showSection('catalog')" class="glass-card p-4 rounded-xl hover:border-brand-500/50 cursor-pointer transition text-center group">
-          <i class="fa-solid fa-crosshairs text-2xl text-red-400 mb-2 group-hover:scale-110 transition-transform"></i>
-          <p class="text-sm font-medium text-gray-200">PUBG Mobile</p>
-          <span class="text-xs text-gray-500">650 лотів</span>
+          <i class="fa-solid fa-shield text-2xl text-red-400 mb-2 group-hover:scale-110 transition-transform"></i>
+          <p class="text-sm font-medium text-gray-200">Інше</p>
         </div>
       </div>
     </section>
@@ -154,11 +148,12 @@
             <div class="space-y-4 text-xs">
               <div>
                 <label class="block text-gray-400 mb-2">Категорія</label>
-                <select class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2 text-gray-200">
-                  <option>Усі категорії</option>
-                  <option>Ігрові послуги</option>
-                  <option>Telegram боти</option>
-                  <option>Дизайн</option>
+                <select id="categoryFilter" onchange="filterProducts()" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2 text-gray-200">
+                  <option value="">Усі категорії</option>
+                  <option value="CS2 Services">CS2 Services</option>
+                  <option value="Telegram">Telegram</option>
+                  <option value="Design">Design</option>
+                  <option value="Minecraft">Minecraft</option>
                 </select>
               </div>
             </div>
@@ -167,8 +162,8 @@
 
         <div class="flex-1">
           <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-bold text-white">Усі пропозиції</h2>
-            <span class="text-xs text-gray-400" id="productCount">Активних лотів: 3</span>
+            <h2 class="text-xl font-bold text-white">Усі пропозиції (База даних)</h2>
+            <span class="text-xs text-gray-400" id="productCount">Завантаження...</span>
           </div>
 
           <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
@@ -180,7 +175,7 @@
     <section id="sec-buyer" class="hidden">
       <h2 class="text-2xl font-bold text-white mb-6">Кабінет покупця (Safe-Escrow)</h2>
       <div class="glass-card rounded-xl p-6 border border-gray-800 mb-8">
-        <h3 class="text-lg font-semibold text-white mb-4">Мої активні замовлення</h3>
+        <h3 class="text-lg font-semibold text-white mb-4">Мої активні замовлення з БД</h3>
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs text-gray-300">
             <thead class="bg-slate-900/80 uppercase text-gray-400 text-[10px]">
@@ -188,21 +183,14 @@
                 <th class="p-3">ID Угоди</th>
                 <th class="p-3">Послуга</th>
                 <th class="p-3">Продавець</th>
-                <th class="p-3">Сума</th>
+                <th class="p-3">Сума + Комісія (3%)</th>
                 <th class="p-3">Статус</th>
                 <th class="p-3 text-right">Дія</th>
               </tr>
             </thead>
             <tbody id="buyerOrdersList" class="divide-y divide-gray-800">
               <tr>
-                <td class="p-3 font-mono">#ORD-9482</td>
-                <td class="p-3 font-medium text-white">Буст ELO FACEIT (+100 elo)</td>
-                <td class="p-3">@pro_booster</td>
-                <td class="p-3">367.50 ₴</td>
-                <td class="p-3"><span id="orderStatusBadge" class="bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded text-[10px] border border-amber-500/20">В роботі (Кошти в Escrow)</span></td>
-                <td class="p-3 text-right">
-                  <button onclick="completeOrder()" class="bg-brand-500 hover:bg-brand-600 text-slate-950 px-2.5 py-1 rounded font-semibold transition">Підтвердити</button>
-                </td>
+                <td colspan="6" class="p-4 text-center text-gray-500">Завантаження замовлень...</td>
               </tr>
             </tbody>
           </table>
@@ -222,15 +210,15 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="glass-card p-5 rounded-xl border border-gray-800">
           <span class="text-xs text-gray-400">Баланс доступний до виводу (Mono/Privat)</span>
-          <p class="text-2xl font-extrabold text-white mt-1">4 850 ₴</p>
+          <p class="text-2xl font-extrabold text-white mt-1">0.00 ₴</p>
         </div>
         <div class="glass-card p-5 rounded-xl border border-gray-800">
           <span class="text-xs text-gray-400">Зароблено за весь час</span>
-          <p class="text-2xl font-extrabold text-brand-500 mt-1">12 400 ₴</p>
+          <p class="text-2xl font-extrabold text-brand-500 mt-1">0.00 ₴</p>
         </div>
         <div class="glass-card p-5 rounded-xl border border-gray-800">
           <span class="text-xs text-gray-400">Рейтинг продавця</span>
-          <p class="text-2xl font-extrabold text-amber-400 mt-1">4.98 ★</p>
+          <p class="text-2xl font-extrabold text-amber-400 mt-1">5.00 ★</p>
         </div>
       </div>
     </section>
@@ -240,13 +228,13 @@
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-white">Панель адміністратора</h2>
         <div class="bg-brand-500/10 border border-brand-500/30 text-brand-500 px-4 py-2 rounded-xl text-xs font-bold">
-          Дохід маркетплейсу (Комісія 5%): <span class="text-white">1 420 ₴</span>
+          Комісія сервісу: <span class="text-white">3%</span>
         </div>
       </div>
 
-      <div class="glass-card p-6 rounded-xl border border-red-500/20 mb-6">
-        <h3 class="text-md font-bold text-red-400 mb-3"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Відкриті арбітражі (0)</h3>
-        <p class="text-xs text-gray-400">Усі угоди проходять у штатному режимі через Safe-Escrow.</p>
+      <div class="glass-card p-6 rounded-xl border border-emerald-500/20 mb-6">
+        <h3 class="text-md font-bold text-brand-500 mb-2"><i class="fa-solid fa-server mr-2"></i>Бекенд та База Даних</h3>
+        <p class="text-xs text-gray-400">Сервер SQLite працює на Node.js + Express. Усі товари та замовлення синхронізуються з базой даних на Render.</p>
       </div>
     </section>
 
@@ -258,27 +246,20 @@
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
         <i class="fa-solid fa-xmark text-lg"></i>
       </button>
-
       <h3 id="authTitle" class="text-lg font-bold text-white mb-4">Вхід у DealPay</h3>
-      
       <div class="space-y-4 text-xs mb-6">
         <div>
-          <label class="block text-gray-400 mb-1">Нікнейм або Email</label>
-          <input type="text" id="authEmail" placeholder="your_name" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-gray-200">
-        </div>
-        <div>
-          <label class="block text-gray-400 mb-1">Пароль</label>
-          <input type="password" id="authPass" placeholder="••••••••" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-gray-200">
+          <label class="block text-gray-400 mb-1">Нікнейм</label>
+          <input type="text" id="authEmail" placeholder="your_nickname" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-gray-200">
         </div>
       </div>
-
       <button onclick="submitAuth()" class="w-full bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold py-3 rounded-xl transition text-sm shadow-lg shadow-emerald-500/20">
         Продовжити
       </button>
     </div>
   </div>
 
-  <!-- MODAL PAYMENT SIMULATOR -->
+  <!-- MODAL PAYMENT -->
   <div id="modal-pay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
     <div class="glass-card max-w-md w-full p-6 rounded-2xl border border-gray-800 relative shadow-2xl">
       <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
@@ -296,23 +277,23 @@
       <div class="space-y-3 text-xs bg-slate-900/90 p-4 rounded-xl border border-gray-800 mb-6">
         <div class="flex justify-between text-gray-300">
           <span>Послуга:</span>
-          <span id="payModalTitle" class="font-semibold text-white">Буст ELO FACEIT</span>
+          <span id="payModalTitle" class="font-semibold text-white">-</span>
         </div>
         <div class="flex justify-between text-gray-300">
           <span>Ціна продавця:</span>
-          <span id="payModalBasePrice" class="font-semibold text-white">350 ₴</span>
+          <span id="payModalBasePrice" class="font-semibold text-white">0 ₴</span>
         </div>
         <div class="flex justify-between text-gray-300">
-          <span>Комісія маркетплейсу (5%):</span>
-          <span id="payModalFee" class="font-semibold text-brand-500">17.50 ₴</span>
+          <span>Комісія сервісу (3%):</span>
+          <span id="payModalFee" class="font-semibold text-brand-500">0 ₴</span>
         </div>
         <div class="border-t border-gray-800 pt-2 flex justify-between text-sm font-bold text-white">
           <span>Разом до сплати:</span>
-          <span id="payModalTotal" class="text-brand-500">367.50 ₴</span>
+          <span id="payModalTotal" class="text-brand-500">0 ₴</span>
         </div>
       </div>
 
-      <button onclick="simulatePayment()" class="w-full bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold py-3 rounded-xl transition text-sm shadow-lg shadow-emerald-500/20">
+      <button onclick="createOrderInDB()" class="w-full bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold py-3 rounded-xl transition text-sm shadow-lg shadow-emerald-500/20">
         Сплатити через Monobank / PrivatBank
       </button>
     </div>
@@ -347,45 +328,96 @@
         </div>
         <div>
           <label class="block text-gray-400 mb-1">Опис</label>
-          <textarea id="newDesc" rows="3" placeholder="Опишіть деталі виконання послуги..." class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2 text-gray-200"></textarea>
+          <textarea id="newDesc" rows="3" placeholder="Опишіть деталі..." class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2 text-gray-200"></textarea>
         </div>
       </div>
 
-      <button onclick="addProduct()" class="w-full bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold py-3 rounded-xl transition text-sm shadow-lg shadow-emerald-500/20">
-        Опублікувати лот
+      <button onclick="addProductToDB()" class="w-full bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold py-3 rounded-xl transition text-sm shadow-lg shadow-emerald-500/20">
+        Зберегти послугу в БД
       </button>
     </div>
   </div>
 
   <script>
     let currentUser = null;
+    let selectedProduct = null;
+    let allProducts = [];
 
-    let products = [
-      { id: 1, title: "Швидкий буст ELO FACEIT від гравця Level 10", category: "CS2 Services", price: 350, rating: "4.9 (128)", desc: "Чиста гра без софту, дуо або з передачею акаунту. Гарантія термінів.", tagColor: "emerald" },
-      { id: 2, title: "Розробка Telegram-бота автопродажів на Python", category: "Telegram", price: 1500, rating: "5.0 (42)", desc: "Підключення LiqPay/CryptoBot, адмін-панель, база даних SQLite/PostgreSQL.", tagColor: "cyan" },
-      { id: 3, title: "Клікабельне прев'ю для YouTube / TikTok препак (3 шт)", category: "Design", price: 600, rating: "4.8 (89)", desc: "Яскравий 3D-стиль, обробка персонажів, високий CTR під вашу тематику.", tagColor: "purple" }
-    ];
+    // Завантаження товарів із сервера Node.js
+    async function loadProducts() {
+      try {
+        const res = await fetch('/api/products');
+        allProducts = await res.json();
+        renderProducts(allProducts);
+      } catch (err) {
+        console.error('Помилка завантаження товарів:', err);
+      }
+    }
+
+    // Завантаження замовлень із сервера Node.js
+    async function loadOrders() {
+      try {
+        const res = await fetch('/api/orders');
+        const orders = await res.json();
+        const tbody = document.getElementById('buyerOrdersList');
+        
+        if (orders.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">Немає активних замовлень</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = '';
+        orders.forEach(o => {
+          const isCompleted = o.status === 'completed';
+          tbody.innerHTML += `
+            <tr>
+              <td class="p-3 font-mono">${o.order_code}</td>
+              <td class="p-3 font-medium text-white">${o.product_title}</td>
+              <td class="p-3">${o.seller}</td>
+              <td class="p-3 font-bold text-white">${o.total.toFixed(2)} ₴</td>
+              <td class="p-3">
+                <span class="${isCompleted ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'} px-2 py-0.5 rounded text-[10px] border">
+                  ${isCompleted ? 'Завершено (Виплачено)' : 'В роботі (Escrow)'}
+                </span>
+              </td>
+              <td class="p-3 text-right">
+                ${!isCompleted ? `<button onclick="completeOrderInDB('${o.order_code}')" class="bg-brand-500 hover:bg-brand-600 text-slate-950 px-2.5 py-1 rounded font-semibold transition">Підтвердити</button>` : '<span class="text-gray-500">Угода закрита</span>'}
+              </td>
+            </tr>
+          `;
+        });
+      } catch (err) {
+        console.error('Помилка завантаження замовлень:', err);
+      }
+    }
 
     function renderProducts(items) {
       const grid = document.getElementById('productsGrid');
       grid.innerHTML = '';
+      if(items.length === 0) {
+        grid.innerHTML = '<p class="text-gray-500 text-sm">Немає збережених послуг у базі даних.</p>';
+        document.getElementById('productCount').innerText = `Активних лотів: 0`;
+        return;
+      }
+
       items.forEach(p => {
         grid.innerHTML += `
           <div class="glass-card rounded-xl border border-gray-800 hover:border-brand-500/40 transition overflow-hidden group flex flex-col justify-between">
             <div class="p-5">
               <div class="flex justify-between items-start mb-3">
-                <span class="bg-${p.tagColor || 'emerald'}-500/10 text-${p.tagColor || 'emerald'}-400 text-[10px] font-semibold px-2.5 py-1 rounded-full border border-${p.tagColor || 'emerald'}-500/20">${p.category}</span>
-                <span class="text-xs text-gray-400"><i class="fa-solid fa-star text-amber-400 mr-1"></i>${p.rating}</span>
+                <span class="bg-brand-500/10 text-brand-400 text-[10px] font-semibold px-2.5 py-1 rounded-full border border-brand-500/20">${p.category}</span>
+                <span class="text-xs text-gray-400"><i class="fa-solid fa-star text-amber-400 mr-1"></i>${p.rating || '5.0'}</span>
               </div>
               <h3 class="font-semibold text-white group-hover:text-brand-500 transition line-clamp-2 text-sm mb-2">${p.title}</h3>
               <p class="text-xs text-gray-400 line-clamp-2 mb-4">${p.desc}</p>
+              <span class="text-[10px] text-gray-500">Продавець: ${p.seller}</span>
             </div>
             <div class="p-5 border-t border-gray-800/80 bg-slate-950/40 flex items-center justify-between">
               <div>
                 <span class="text-xs text-gray-500 block">Ціна</span>
                 <span class="text-lg font-extrabold text-white">${p.price} ₴</span>
               </div>
-              <button onclick="openModal('${p.title}', ${p.price})" class="bg-brand-500/10 hover:bg-brand-500 text-brand-500 hover:text-slate-950 font-semibold px-3 py-1.5 rounded-lg text-xs transition border border-brand-500/30">
+              <button onclick="openModal('${p.title}', ${p.price}, '${p.seller}')" class="bg-brand-500/10 hover:bg-brand-500 text-brand-500 hover:text-slate-950 font-semibold px-3 py-1.5 rounded-lg text-xs transition border border-brand-500/30">
                 Купити
               </button>
             </div>
@@ -395,26 +427,86 @@
       document.getElementById('productCount').innerText = `Активних лотів: ${items.length}`;
     }
 
+    // Додавання послуги в БД на сервері
+    async function addProductToDB() {
+      const title = document.getElementById('newTitle').value;
+      const category = document.getElementById('newCategory').value;
+      const price = Number(document.getElementById('newPrice').value);
+      const desc = document.getElementById('newDesc').value;
+
+      if (!title || !price) return alert('Заповніть назву та ціну!');
+
+      await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title, category, price, desc, seller: currentUser || '@seller'
+        })
+      });
+
+      closeCreateModal();
+      loadProducts();
+      showSection('catalog');
+    }
+
+    // Створення замовлення в БД на сервері
+    async function createOrderInDB() {
+      if(!selectedProduct) return;
+
+      await fetch('/api/orders/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product_title: selectedProduct.title,
+          price: selectedProduct.price,
+          buyer: currentUser || '@buyer',
+          seller: selectedProduct.seller
+        })
+      });
+
+      closeModal();
+      loadOrders();
+      showSection('buyer');
+      alert('Замовлення збережено в БД! Кошти зарезервовано в Escrow.');
+    }
+
+    // Підтвердження угоди в БД
+    async function completeOrderInDB(order_code) {
+      await fetch('/api/orders/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order_code })
+      });
+
+      loadOrders();
+      alert('Угоду завершено в БД! Кошти перераховано продавцю.');
+    }
+
     function filterProducts() {
       const query = document.getElementById('searchInput').value.toLowerCase();
-      const filtered = products.filter(p => p.title.toLowerCase().includes(query) || p.category.toLowerCase().includes(query));
+      const cat = document.getElementById('categoryFilter').value;
+      const filtered = allProducts.filter(p => {
+        const matchesQuery = p.title.toLowerCase().includes(query);
+        const matchesCat = cat === '' || p.category === cat;
+        return matchesQuery && matchesCat;
+      });
       renderProducts(filtered);
     }
 
     function showSection(sectionId) {
-      const sections = ['home', 'catalog', 'buyer', 'seller', 'admin'];
-      sections.forEach(s => {
-        const el = document.getElementById('sec-' + s);
-        if (el) el.classList.add('hidden');
+      ['home', 'catalog', 'buyer', 'seller', 'admin'].forEach(s => {
+        document.getElementById('sec-' + s).classList.add('hidden');
       });
-      const activeEl = document.getElementById('sec-' + sectionId);
-      if (activeEl) activeEl.classList.remove('hidden');
+      document.getElementById('sec-' + sectionId).classList.remove('hidden');
+      if(sectionId === 'catalog') loadProducts();
+      if(sectionId === 'buyer') loadOrders();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function openModal(title, price) {
-      const fee = price * 0.05; // 5% Комісія маркетплейсу
+    function openModal(title, price, seller) {
+      const fee = price * 0.03;
       const total = price + fee;
+      selectedProduct = { title, price, seller };
 
       document.getElementById('payModalTitle').innerText = title;
       document.getElementById('payModalBasePrice').innerText = price + ' ₴';
@@ -462,7 +554,6 @@
       document.getElementById('userProfile').classList.add('flex');
       
       closeAuthModal();
-      alert('Успішний вхід! Вітаємо, ' + currentUser);
     }
 
     function logout() {
@@ -472,46 +563,8 @@
       document.getElementById('userProfile').classList.remove('flex');
     }
 
-    function addProduct() {
-      const title = document.getElementById('newTitle').value;
-      const category = document.getElementById('newCategory').value;
-      const price = document.getElementById('newPrice').value;
-      const desc = document.getElementById('newDesc').value;
-
-      if(!title || !price) {
-        alert('Будь ласка, заповніть назву та ціну!');
-        return;
-      }
-
-      products.unshift({
-        id: products.length + 1,
-        title: title,
-        category: category,
-        price: Number(price),
-        rating: "Новий",
-        desc: desc || "Без опису",
-        tagColor: "emerald"
-      });
-
-      renderProducts(products);
-      closeCreateModal();
-      showSection('catalog');
-      alert('Послугу успішно опубліковано в каталозі!');
-    }
-
-    function simulatePayment() {
-      alert('Успішна оплата! Кошти зарезервовано на Escrow-рахунку DealPay.');
-      closeModal();
-      showSection('buyer');
-    }
-
-    function completeOrder() {
-      document.getElementById('orderStatusBadge').className = "bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded text-[10px] border border-emerald-500/20";
-      document.getElementById('orderStatusBadge').innerText = "Завершено (Кошти відправлено продавцю)";
-      alert('Угоду підтверджено! Кошти переведено з Escrow на баланс продавця, а комісія 5% вирахована в дохід маркетплейсу.');
-    }
-
-    renderProducts(products);
+    // Первинне завантаження
+    loadProducts();
   </script>
 </body>
 </html>
