@@ -64,8 +64,9 @@
         </div>
 
         <div id="authButtons" class="flex items-center space-x-2">
-          <button onclick="openAuthModal('login')" class="text-xs font-semibold text-gray-300 hover:text-white px-3 py-2 transition">Вхід</button>
-          <button onclick="openAuthModal('register')" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold px-3 py-1.5 rounded-lg text-xs border border-gray-700 transition">Реєстрація</button>
+          <button onclick="openAuthModal('login')" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold px-3 py-1.5 rounded-lg text-xs border border-gray-700 transition">
+            <i class="fa-brands fa-telegram mr-1 text-brand-accent"></i> Вхід через Telegram
+          </button>
         </div>
 
         <div id="userProfile" class="hidden items-center space-x-2">
@@ -95,7 +96,7 @@
             Головний український цифровий маркетплейс
           </h1>
           <p class="text-gray-400 text-base mb-6">
-            Купуйте та продавайте ігрові послуги, Telegram-ботів, дизайн та розробку з миттєвою гарантією збереження коштів у гривнях (₴).
+            Купуйте та продавайте ігрові послуги, Telegram-ботів, дизайн та розробку з миттєвою гарантією збереження коштів у гривнях (₴). Захист від скаму через Telegram-авторизацію.
           </p>
           <div class="flex flex-wrap gap-4">
             <button onclick="showSection('catalog')" class="bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold px-6 py-3 rounded-xl transition shadow-lg shadow-emerald-500/20">
@@ -234,27 +235,33 @@
 
       <div class="glass-card p-6 rounded-xl border border-emerald-500/20 mb-6">
         <h3 class="text-md font-bold text-brand-500 mb-2"><i class="fa-solid fa-server mr-2"></i>Бекенд та База Даних</h3>
-        <p class="text-xs text-gray-400">Сервер SQLite працює на Node.js + Express. Усі товари та замовлення синхронізуються з базой даних на Render.</p>
+        <p class="text-xs text-gray-400">Сервер SQLite працює на Node.js + Express. Авторизація через Telegram активна для всіх користувачів.</p>
       </div>
     </section>
 
   </main>
 
-  <!-- MODAL AUTH -->
+  <!-- MODAL AUTH (TELEGRAM) -->
   <div id="modal-auth" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
     <div class="glass-card max-w-sm w-full p-6 rounded-2xl border border-gray-800 relative shadow-2xl">
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
         <i class="fa-solid fa-xmark text-lg"></i>
       </button>
-      <h3 id="authTitle" class="text-lg font-bold text-white mb-4">Вхід у DealPay</h3>
+      <div class="text-center mb-4">
+        <div class="w-12 h-12 bg-brand-accent/10 text-brand-accent rounded-full flex items-center justify-center mx-auto mb-2 border border-brand-accent/20">
+          <i class="fa-brands fa-telegram text-2xl"></i>
+        </div>
+        <h3 id="authTitle" class="text-lg font-bold text-white">Вхід через Telegram</h3>
+        <p class="text-[11px] text-gray-400 mt-1">Введіть свій Telegram Username, щоб підтвердити особу та уникнути скаму.</p>
+      </div>
       <div class="space-y-4 text-xs mb-6">
         <div>
-          <label class="block text-gray-400 mb-1">Нікнейм</label>
-          <input type="text" id="authEmail" placeholder="your_nickname" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-gray-200">
+          <label class="block text-gray-400 mb-1">Telegram Username</label>
+          <input type="text" id="authEmail" placeholder="@your_username" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-gray-200 focus:outline-none focus:border-brand-500">
         </div>
       </div>
       <button onclick="submitAuth()" class="w-full bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold py-3 rounded-xl transition text-sm shadow-lg shadow-emerald-500/20">
-        Продовжити
+        Підтвердити вхід
       </button>
     </div>
   </div>
@@ -343,7 +350,6 @@
     let selectedProduct = null;
     let allProducts = [];
 
-    // Завантаження товарів із сервера Node.js
     async function loadProducts() {
       try {
         const res = await fetch('/api/products');
@@ -354,7 +360,6 @@
       }
     }
 
-    // Завантаження замовлень із сервера Node.js
     async function loadOrders() {
       try {
         const res = await fetch('/api/orders');
@@ -427,8 +432,13 @@
       document.getElementById('productCount').innerText = `Активних лотів: ${items.length}`;
     }
 
-    // Додавання послуги в БД на сервері
     async function addProductToDB() {
+      if (!currentUser) {
+        alert('⚠️ Для створення послуги необхідно увійти через Telegram!');
+        openAuthModal('login');
+        return;
+      }
+
       const title = document.getElementById('newTitle').value;
       const category = document.getElementById('newCategory').value;
       const price = Number(document.getElementById('newPrice').value);
@@ -440,7 +450,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title, category, price, desc, seller: currentUser || '@seller'
+          title, category, price, desc, seller: currentUser
         })
       });
 
@@ -449,8 +459,12 @@
       showSection('catalog');
     }
 
-    // Створення замовлення в БД на сервері
     async function createOrderInDB() {
+      if (!currentUser) {
+        alert('⚠️ Для оплати необхідно увійти через Telegram!');
+        openAuthModal('login');
+        return;
+      }
       if(!selectedProduct) return;
 
       await fetch('/api/orders/create', {
@@ -459,7 +473,7 @@
         body: JSON.stringify({
           product_title: selectedProduct.title,
           price: selectedProduct.price,
-          buyer: currentUser || '@buyer',
+          buyer: currentUser,
           seller: selectedProduct.seller
         })
       });
@@ -470,7 +484,6 @@
       alert('Замовлення збережено в БД! Кошти зарезервовано в Escrow.');
     }
 
-    // Підтвердження угоди в БД
     async function completeOrderInDB(order_code) {
       await fetch('/api/orders/complete', {
         method: 'POST',
@@ -504,6 +517,12 @@
     }
 
     function openModal(title, price, seller) {
+      if (!currentUser) {
+        alert('⚠️ Для купівлі послуги увійдіть через Telegram!');
+        openAuthModal('login');
+        return;
+      }
+
       const fee = price * 0.03;
       const total = price + fee;
       selectedProduct = { title, price, seller };
@@ -523,6 +542,12 @@
     }
 
     function openCreateModal() {
+      if (!currentUser) {
+        alert('⚠️ Щоб продавати послуги, увійдіть через Telegram!');
+        openAuthModal('login');
+        return;
+      }
+
       document.getElementById('modal-create').classList.remove('hidden');
       document.getElementById('modal-create').classList.add('flex');
     }
@@ -533,7 +558,6 @@
     }
 
     function openAuthModal(mode) {
-      document.getElementById('authTitle').innerText = mode === 'login' ? 'Вхід у DealPay' : 'Реєстрація в DealPay';
       document.getElementById('modal-auth').classList.remove('hidden');
       document.getElementById('modal-auth').classList.add('flex');
     }
@@ -544,8 +568,8 @@
     }
 
     function submitAuth() {
-      const name = document.getElementById('authEmail').value;
-      if(!name) return alert('Введіть нікнейм!');
+      const name = document.getElementById('authEmail').value.trim();
+      if(!name) return alert('Введіть Telegram Username!');
       
       currentUser = name.startsWith('@') ? name : '@' + name;
       document.getElementById('userName').innerText = currentUser;
@@ -563,7 +587,6 @@
       document.getElementById('userProfile').classList.remove('flex');
     }
 
-    // Первинне завантаження
     loadProducts();
   </script>
 </body>
