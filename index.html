@@ -85,7 +85,6 @@
             <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-3">Український маркетплейс ігрових цінностей</h1>
             <p class="text-gray-400 text-sm mb-6">Купуйте та продавайте аккаунти, вірти та скіни в популярних іграх з миттєвим зарахуванням.</p>
             
-            <!-- Кнопки швидких категорій -->
             <div class="flex flex-wrap gap-2">
               <button onclick="filterCategory('')" class="bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs transition">Усі ігри</button>
               <button onclick="filterCategory('CS2')" class="bg-slate-900 hover:bg-slate-800 text-gray-200 px-3 py-2 rounded-xl border border-gray-700 text-xs transition">CS2</button>
@@ -129,7 +128,10 @@
               <div class="text-2xl font-extrabold text-white mb-6" id="detailPrice">0 ₴</div>
               
               <div class="border-t border-gray-800 pt-4 mb-6 text-xs text-gray-400 space-y-2">
-                <div class="flex justify-between"><span>Продавець:</span> <strong id="detailSeller" class="text-white"></strong></div>
+                <div class="flex justify-between items-center">
+                  <span>Продавець:</span> 
+                  <a id="detailSellerLink" href="#" onclick="openSellerProfile(event)" class="text-brand-500 font-bold hover:underline"></a>
+                </div>
                 <div class="flex justify-between"><span>Рейтинг продавця:</span> <strong id="detailSellerRating" class="text-amber-400">★ 0.0 (0)</strong></div>
                 <div class="flex justify-between"><span>Безпека:</span> <strong class="text-brand-500">Safe-Escrow</strong></div>
               </div>
@@ -143,6 +145,34 @@
             </div>
           </div>
         </div>
+      </section>
+
+      <!-- ПУБЛІЧНИЙ ПРОФІЛЬ ПРОДАВЦЯ -->
+      <section id="sec-seller-profile" class="hidden">
+        <button onclick="showSection('catalog')" class="text-xs text-brand-500 hover:underline mb-6 flex items-center"><i class="fa-solid fa-arrow-left mr-2"></i> Назад до каталогу</button>
+        
+        <div class="glass-card p-8 rounded-2xl border border-gray-800 mb-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div class="flex items-center space-x-4">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-brand-500 to-brand-accent flex items-center justify-center text-slate-950 font-bold text-2xl" id="profileAvatarLetter">U</div>
+            <div>
+              <h2 id="profileSellerName" class="text-xl font-bold text-white">@seller</h2>
+              <p class="text-xs text-gray-400 mt-1">Офіційний продавець маркетплейсу DealPay</p>
+            </div>
+          </div>
+          <div class="flex space-x-6 text-center">
+            <div class="bg-slate-900/80 px-5 py-3 rounded-xl border border-gray-800">
+              <span class="text-[10px] text-gray-400 block">Рейтинг</span>
+              <span id="profileRating" class="text-lg font-extrabold text-amber-400">★ 0.0</span>
+            </div>
+            <div class="bg-slate-900/80 px-5 py-3 rounded-xl border border-gray-800">
+              <span class="text-[10px] text-gray-400 block">Відгуків</span>
+              <span id="profileReviewsCount" class="text-lg font-extrabold text-white">0</span>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="text-lg font-bold text-white mb-6">Оголошення користувача</h3>
+        <div id="sellerProductsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
       </section>
 
       <!-- BUYER -->
@@ -231,7 +261,7 @@
     </div>
   </div>
 
-  <!-- MODAL TOPUP (Поповнення балансу) -->
+  <!-- MODAL TOPUP -->
   <div id="modal-topup" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
     <div class="glass-card max-w-sm w-full p-6 rounded-2xl border border-gray-800 relative">
       <button onclick="closeTopUpModal()" class="absolute top-4 right-4 text-gray-400"><i class="fa-solid fa-xmark"></i></button>
@@ -241,7 +271,7 @@
     </div>
   </div>
 
-  <!-- MODAL REVIEW (Відгук та рейтинг після покупки) -->
+  <!-- MODAL REVIEW -->
   <div id="modal-review" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
     <div class="glass-card max-w-sm w-full p-6 rounded-2xl border border-gray-800 relative text-center">
       <h3 class="text-lg font-bold text-white mb-2">Оцініть угоду</h3>
@@ -262,6 +292,7 @@
     let currentUser = null;
     let allProducts = [];
     let currentProductId = null;
+    let currentSellerName = '';
     let selectedRating = 5;
     let activeCategory = '';
     const ADMIN_USER = '@Salxanich';
@@ -342,14 +373,14 @@
       const p = allProducts.find(item => item.id === id);
       if (!p) return;
       currentProductId = p.id;
+      currentSellerName = p.seller;
 
       document.getElementById('detailTitle').innerText = p.title;
       document.getElementById('detailCategory').innerText = p.category;
       document.getElementById('detailPrice').innerText = p.price + ' ₴';
       document.getElementById('detailDesc').innerText = p.desc || 'Опис відсутній.';
-      document.getElementById('detailSeller').innerText = p.seller;
+      document.getElementById('detailSellerLink').innerText = p.seller;
 
-      // Отримуємо рейтинг продавця для сторінки товару
       const res = await fetch(`/api/profile/${encodeURIComponent(p.seller)}`);
       const prof = await res.json();
       document.getElementById('detailSellerRating').innerText = `★ ${prof.rating} (${prof.reviews_count})`;
@@ -369,6 +400,45 @@
 
       document.getElementById('detailBuyBtn').onclick = () => createOrder(p.title, p.price, p.seller);
       showSection('product-detail');
+    }
+
+    // ВІДКРИТТЯ ПРОФІЛЮ ПРОДАВЦЯ
+    async function openSellerProfile(event) {
+      event.preventDefault();
+      if (!currentSellerName) return;
+
+      document.getElementById('profileSellerName').innerText = currentSellerName;
+      document.getElementById('profileAvatarLetter').innerText = currentSellerName.charAt(1).toUpperCase();
+
+      const res = await fetch(`/api/profile/${encodeURIComponent(currentSellerName)}`);
+      const prof = await res.json();
+      document.getElementById('profileRating').innerText = `★ ${prof.rating}`;
+      document.getElementById('profileReviewsCount').innerText = prof.reviews_count;
+
+      const sellerGrid = document.getElementById('sellerProductsGrid');
+      const sellerItems = allProducts.filter(p => p.seller === currentSellerName);
+      
+      sellerGrid.innerHTML = '';
+      if (sellerItems.length === 0) {
+        sellerGrid.innerHTML = '<p class="text-gray-500 text-xs">У цього продавця поки немає інших оголошень.</p>';
+      } else {
+        sellerItems.forEach(p => {
+          const mainImg = p.images && p.images.length > 0 ? p.images[0] : 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500';
+          sellerGrid.innerHTML += `
+            <div class="glass-card rounded-xl border border-gray-800 overflow-hidden flex flex-col justify-between group hover:border-brand-500/50 transition cursor-pointer" onclick="openProductDetail(${p.id})">
+              <div class="h-40 bg-slate-900 relative overflow-hidden">
+                <img src="${mainImg}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                <span class="absolute top-2 left-2 bg-slate-950/85 text-brand-400 text-[10px] px-2 py-0.5 rounded-full border border-brand-500/20">${p.category}</span>
+              </div>
+              <div class="p-3">
+                <h4 class="font-semibold text-white text-xs mb-1 line-clamp-1">${p.title}</h4>
+                <span class="text-sm font-extrabold text-white">${p.price} ₴</span>
+              </div>
+            </div>`;
+        });
+      }
+
+      showSection('seller-profile');
     }
 
     async function createOrder(title, price, seller) {
@@ -394,7 +464,7 @@
         <tr>
           <td class="p-3 font-mono">${o.order_code}</td>
           <td class="p-3 text-white">${o.product_title}</td>
-          <td class="p-3">${o.seller}</td>
+          <td class="p-3"><a href="#" onclick="currentSellerName='${o.seller}'; openSellerProfile(event);" class="text-brand-500 hover:underline">${o.seller}</a></td>
           <td class="p-3 font-bold text-white">${o.total.toFixed(2)} ₴</td>
           <td class="p-3"><span class="${o.status === 'completed' ? 'text-emerald-400 bg-emerald-500/10' : 'text-amber-400 bg-amber-500/10'} px-2 py-0.5 rounded text-[10px] border">${o.status === 'completed' ? 'Завершено' : 'В Escrow'}</span></td>
           <td class="p-3 text-right">
@@ -404,7 +474,6 @@
       `).join('');
     }
 
-    // ВІДГУКИ ТА ОЦІНКИ
     function openReviewModal(orderCode) {
       document.getElementById('reviewOrderCode').value = orderCode;
       setRating(5);
@@ -431,7 +500,6 @@
       alert('Дякуємо! Угоду закрито, рейтинг продавця оновлено.');
     }
 
-    // ПОПОВНЕННЯ БАЛАНСУ
     function openTopUpModal() { document.getElementById('modal-topup').classList.remove('hidden'); document.getElementById('modal-topup').classList.add('flex'); }
     function closeTopUpModal() { document.getElementById('modal-topup').classList.add('hidden'); }
     async function topUpBalance() {
@@ -547,7 +615,7 @@
     }
 
     function showSection(id) {
-      ['catalog', 'product-detail', 'buyer', 'seller', 'support', 'admin'].forEach(s => document.getElementById('sec-' + s).classList.add('hidden'));
+      ['catalog', 'product-detail', 'seller-profile', 'buyer', 'seller', 'support', 'admin'].forEach(s => document.getElementById('sec-' + s).classList.add('hidden'));
       document.getElementById('sec-' + id).classList.remove('hidden');
       if (id === 'catalog') loadProducts();
       if (id === 'buyer') loadOrders();
