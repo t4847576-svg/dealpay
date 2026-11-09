@@ -1,12 +1,33 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const multer = require('multer');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname)));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Создаем папку для загрузок, если её нет
+if (!fs.existsSync('./uploads')) {
+    fs.mkdirSync('./uploads');
+}
+
+// Настройка хранилища для multer (сохранение файлов)
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/');
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
+});
+const upload = multer({ storage: storage, limits: { fileSize: 5 * 1024 * 1024 } }); // лимит 5MB
 
 const db = new sqlite3.Database('./dealpay.db', (err) => {
     if (err) console.error('Ошибка БД:', err.message);
@@ -14,7 +35,6 @@ const db = new sqlite3.Database('./dealpay.db', (err) => {
 });
 
 db.serialize(() => {
-    // Таблица товаров (поддержка массива картинок JSON)
     db.run(`CREATE TABLE IF NOT EXISTS products (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT,
@@ -26,7 +46,6 @@ db.serialize(() => {
         rating TEXT DEFAULT '5.0'
     )`);
 
-    // Таблица заказов / сделок Escrow
     db.run(`CREATE TABLE IF NOT EXISTS orders (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         order_code TEXT,
@@ -39,7 +58,6 @@ db.serialize(() => {
         status TEXT DEFAULT 'pending'
     )`);
 
-    // Таблица балансов продавцов
     db.run(`CREATE TABLE IF NOT EXISTS balances (
         seller TEXT PRIMARY KEY,
         available REAL DEFAULT 0.0,
@@ -58,11 +76,14 @@ app.get('/api/products', (req, res) => {
     });
 });
 
-// Добавить товар с массивом фото (до 10 шт)
-app.post('/api/products', (req, res) => {
-    const { title, category, price, desc, images, seller } = req.body;
-    const imagesJson = JSON.stringify(images || []);
+// Создать товар с загрузкой файлов (до 10 штук)
+app.post('/api/products', upload.array('photos', 10), (req, res) => {
+    const { title, category, price, desc, seller } = req.body;
     
+    // Получаем пути к загруженным файлам
+    const images = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
+    const imagesJson = JSON.stringify(images);
+
     const query = `INSERT INTO products (title, category, price, desc, images, seller) VALUES (?, ?, ?, ?, ?, ?)`;
     db.run(query, [title, category, price, desc, imagesJson, seller], function(err) {
         if (err) return res.status(500).json({ error: err.message });
@@ -70,7 +91,6 @@ app.post('/api/products', (req, res) => {
     });
 });
 
-// Получить заказы
 app.get('/api/orders', (req, res) => {
     db.all("SELECT * FROM orders ORDER BY id DESC", [], (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
@@ -78,7 +98,6 @@ app.get('/api/orders', (req, res) => {
     });
 });
 
-// Создать заказ (Escrow)
 app.post('/api/orders/create', (req, res) => {
     const { product_title, price, buyer, seller } = req.body;
     const fee = price * 0.03;
@@ -92,17 +111,14 @@ app.post('/api/orders/create', (req, res) => {
     });
 });
 
-// Подтвердить сделку и перевести деньги продавцу
 app.post('/api/orders/complete', (req, res) => {
     const { order_code } = req.body;
-    
     db.get("SELECT * FROM orders WHERE order_code = ? AND status = 'pending'", [order_code], (err, order) => {
-        if (err || !order) return res.status(400).json({ error: "Заказ не найден или уже закрыт" });
+        if (err || !order) return res.status(400).json({ error: "Заказ не найден" });
 
         db.run(`UPDATE orders SET status = 'completed' WHERE order_code = ?`, [order_code], (err) => {
             if (err) return res.status(500).json({ error: err.message });
 
-            // Начисляем баланс продавцу
             db.run(`INSERT INTO balances (seller, available, earned) VALUES (?, ?, ?) 
                     ON CONFLICT(seller) DO UPDATE SET available = available + ?, earned = earned + ?`,
                     [order.seller, order.price, order.price, order.price, order.price], (err) => {
@@ -112,7 +128,6 @@ app.post('/api/orders/complete', (req, res) => {
     });
 });
 
-// Получить баланс продавца
 app.get('/api/balance/:seller', (req, res) => {
     const seller = req.params.seller;
     db.get("SELECT * FROM balances WHERE seller = ?", [seller], (err, row) => {
