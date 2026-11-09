@@ -180,11 +180,10 @@
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-white">Кабінет продавця</h2>
         <button onclick="openCreateModal()" class="bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm transition shadow-lg shadow-emerald-500/20">
-          + Створити оголошення (до 10 фото)
+          + Створити оголошення (з фото)
         </button>
       </div>
 
-      <!-- Финансовые блоки -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="glass-card p-5 rounded-xl border border-gray-800">
           <span class="text-xs text-gray-400">Доступно до виводу (Mono/Privat)</span>
@@ -204,7 +203,7 @@
 
   </main>
 
-  <!-- MODAL PAYMENT (Monobank / Privat) -->
+  <!-- MODAL PAYMENT -->
   <div id="modal-pay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
     <div class="glass-card max-w-md w-full p-6 rounded-2xl border border-gray-800 relative shadow-2xl">
       <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -226,7 +225,7 @@
 
       <div class="space-y-2">
         <button onclick="processPayment('monobank')" class="w-full bg-black hover:bg-gray-900 text-white font-bold py-3 rounded-xl transition text-sm border border-gray-800 flex items-center justify-center space-x-2">
-          <span>Сплатити через Monobank (ApplePay / GooglePay)</span>
+          <span>Сплатити через Monobank</span>
         </button>
         <button onclick="processPayment('privatbank')" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 rounded-xl transition text-sm flex items-center justify-center space-x-2">
           <span>Приват24 / LiqPay</span>
@@ -235,17 +234,17 @@
     </div>
   </div>
 
-  <!-- MODAL CREATE PRODUCT WITH UP TO 10 PHOTOS -->
+  <!-- MODAL CREATE PRODUCT WITH FILE UPLOAD -->
   <div id="modal-create" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
     <div class="glass-card max-w-lg w-full p-6 rounded-2xl border border-gray-800 relative shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
       <button onclick="closeCreateModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
 
-      <h3 class="text-lg font-bold text-white mb-4">Створити оголошення (до 10 фото)</h3>
+      <h3 class="text-lg font-bold text-white mb-4">Створити оголошення (завантаження фото)</h3>
       
       <div class="space-y-3 text-xs mb-6">
         <div>
           <label class="block text-gray-400 mb-1">Назва товару</label>
-          <input type="text" id="newTitle" placeholder="Наприклад: Аккаунт CS2 Prime + Inventory" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-gray-200">
+          <input type="text" id="newTitle" placeholder="Наприклад: Аккаунт CS2 Prime" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-gray-200">
         </div>
         <div>
           <label class="block text-gray-400 mb-1">Гра / Категорія</label>
@@ -262,18 +261,14 @@
         </div>
         <div>
           <label class="block text-gray-400 mb-1">Опис товару</label>
-          <textarea id="newDesc" rows="3" placeholder="Вкажіть дані, пошту, повноту доступу..." class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-gray-200"></textarea>
+          <textarea id="newDesc" rows="3" placeholder="Опишіть характеристики..." class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-gray-200"></textarea>
         </div>
 
-        <!-- Блок для добавления до 10 фото -->
+        <!-- Загрузка файлов с устройства (до 10 штук) -->
         <div>
-          <div class="flex justify-between items-center mb-1">
-            <label class="text-gray-400">Фотографії товару (до 10 посилань URL)</label>
-            <button type="button" onclick="addPhotoInput()" class="text-brand-500 hover:underline">+ Додати фото</button>
-          </div>
-          <div id="photoInputsContainer" class="space-y-2">
-            <input type="text" placeholder="https://imgur.com/image1.jpg" class="photo-input w-full bg-slate-900 border border-gray-800 rounded-lg p-2 text-gray-200">
-          </div>
+          <label class="block text-gray-400 mb-1">Виберіть фотографії (до 10 штук)</label>
+          <input type="file" id="productPhotos" multiple accept="image/*" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2 text-gray-200 file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-brand-500 file:text-slate-950 hover:file:bg-brand-600">
+          <span class="text-[10px] text-gray-500 mt-1 block">Можна обрати кілька фото одразу з телефона чи ПК.</span>
         </div>
       </div>
 
@@ -338,7 +333,7 @@
       try {
         const res = await fetch(`/api/balance/${encodeURIComponent(currentUser)}`);
         const data = await res.json();
-        document.getElementById('sellerBalance.innerText').innerText = `${data.available.toFixed(2)} ₴`;
+        document.getElementById('sellerBalance').innerText = `${data.available.toFixed(2)} ₴`;
         document.getElementById('sellerEarned').innerText = `${data.earned.toFixed(2)} ₴`;
       } catch(e) {}
     }
@@ -377,37 +372,41 @@
       document.getElementById('productCount').innerText = `Лотів: ${items.length}`;
     }
 
-    function addPhotoInput() {
-      const container = document.getElementById('photoInputsContainer');
-      if (container.children.length >= 10) return alert('Максимум 10 фотографій!');
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.placeholder = 'https://imgur.com/...';
-      input.className = 'photo-input w-full bg-slate-900 border border-gray-800 rounded-lg p-2 text-gray-200';
-      container.appendChild(input);
-    }
-
     async function addProductToDB() {
       if (!currentUser) return alert('Увійдіть через Telegram!');
+      
       const title = document.getElementById('newTitle').value;
       const category = document.getElementById('newCategory').value;
-      const price = Number(document.getElementById('newPrice').value);
+      const price = document.getElementById('newPrice').value;
       const desc = document.getElementById('newDesc').value;
-      
-      const imageInputs = document.querySelectorAll('.photo-input');
-      const images = Array.from(imageInputs).map(i => i.value.trim()).filter(url => url.length > 0);
+      const photoInput = document.getElementById('productPhotos');
 
-      if (!title || !price) return alert('Заповніть обовʼязкові поля!');
+      if (!title || !price) return alert('Заповніть назву та ціну!');
 
-      await fetch('/api/products', {
+      // Собираем данные через FormData для отправки файлов на сервер
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('category', category);
+      formData.append('price', price);
+      formData.append('desc', desc);
+      formData.append('seller', currentUser);
+
+      for (let i = 0; i < photoInput.files.length; i++) {
+        formData.append('photos', photoInput.files[i]);
+      }
+
+      const res = await fetch('/api/products', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, category, price, desc, images, seller: currentUser })
+        body: formData
       });
 
-      closeCreateModal();
-      loadProducts();
-      showSection('catalog');
+      if (res.ok) {
+        closeCreateModal();
+        loadProducts();
+        showSection('catalog');
+      } else {
+        alert('Помилка при завантаженні товарів');
+      }
     }
 
     function openModal(title, price, seller) {
@@ -436,7 +435,7 @@
       document.getElementById('modal-pay').classList.add('hidden');
       document.getElementById('modal-pay').classList.remove('flex');
       showSection('buyer');
-      alert(`Оплату через ${gateway} успішно імітовано! Кошти зарезервовано в Escrow.`);
+      alert(`Оплату через ${gateway} імітовано! Кошти в Escrow.`);
       loadOrders();
     }
 
@@ -451,7 +450,7 @@
     }
 
     function requestWithdrawal() {
-      alert('Запит на вихід коштів на Mono/Privat картку надіслано адміністратору!');
+      alert('Запит на вихід коштів на Mono/Privat надіслано!');
     }
 
     function filterByCategory(cat) {
