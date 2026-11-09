@@ -63,15 +63,21 @@
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-500 text-xs"></i>
         </div>
 
-        <div id="authButtons" class="flex items-center space-x-2">
-          <button onclick="openAuthModal('login')" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold px-3 py-1.5 rounded-lg text-xs border border-gray-700 transition">
-            <i class="fa-brands fa-telegram mr-1 text-brand-accent"></i> Вхід через Telegram
-          </button>
+        <!-- Офіційний віджет входу через Telegram (@dealpay_sec_bot) -->
+        <div id="authButtons" class="flex items-center">
+          <script async src="https://telegram.org/js/telegram-widget.js?22" 
+                  data-telegram-login="dealpay_sec_bot" 
+                  data-size="medium" 
+                  data-radius="8"
+                  data-onauth="onTelegramAuth(user)" 
+                  data-request-access="write">
+          </script>
         </div>
 
+        <!-- Блок профілю після авторизації -->
         <div id="userProfile" class="hidden items-center space-x-2">
           <span id="userName" class="text-xs font-bold text-brand-500">@user</span>
-          <button onclick="logout()" class="text-xs text-gray-400 hover:text-red-400"><i class="fa-solid fa-right-from-bracket"></i></button>
+          <button onclick="logout()" class="text-xs text-gray-400 hover:text-red-400 ml-2"><i class="fa-solid fa-right-from-bracket"></i></button>
         </div>
 
         <button onclick="openCreateModal()" class="bg-brand-500 hover:bg-brand-600 text-slate-950 font-semibold px-4 py-2 rounded-lg text-sm transition shadow-lg shadow-emerald-500/20">
@@ -96,7 +102,7 @@
             Головний український цифровий маркетплейс
           </h1>
           <p class="text-gray-400 text-base mb-6">
-            Купуйте та продавайте ігрові послуги, Telegram-ботів, дизайн та розробку з миттєвою гарантією збереження коштів у гривнях (₴). Захист від скаму через Telegram-авторизацію.
+            Купуйте та продавайте ігрові послуги, Telegram-ботів, дизайн та розробку. Авторизація через офіційний віджет Telegram гарантує захист від шахраїв.
           </p>
           <div class="flex flex-wrap gap-4">
             <button onclick="showSection('catalog')" class="bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold px-6 py-3 rounded-xl transition shadow-lg shadow-emerald-500/20">
@@ -106,34 +112,6 @@
               Почати продавати
             </button>
           </div>
-        </div>
-      </div>
-
-      <h2 class="text-xl font-bold text-white mb-6">Популярні категорії</h2>
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-12">
-        <div onclick="showSection('catalog')" class="glass-card p-4 rounded-xl hover:border-brand-500/50 cursor-pointer transition text-center group">
-          <i class="fa-solid fa-gamepad text-2xl text-brand-500 mb-2 group-hover:scale-110 transition-transform"></i>
-          <p class="text-sm font-medium text-gray-200">CS2 Services</p>
-        </div>
-        <div onclick="showSection('catalog')" class="glass-card p-4 rounded-xl hover:border-brand-500/50 cursor-pointer transition text-center group">
-          <i class="fa-brands fa-telegram text-2xl text-brand-accent mb-2 group-hover:scale-110 transition-transform"></i>
-          <p class="text-sm font-medium text-gray-200">Telegram</p>
-        </div>
-        <div onclick="showSection('catalog')" class="glass-card p-4 rounded-xl hover:border-brand-500/50 cursor-pointer transition text-center group">
-          <i class="fa-solid fa-palette text-2xl text-purple-400 mb-2 group-hover:scale-110 transition-transform"></i>
-          <p class="text-sm font-medium text-gray-200">Design</p>
-        </div>
-        <div onclick="showSection('catalog')" class="glass-card p-4 rounded-xl hover:border-brand-500/50 cursor-pointer transition text-center group">
-          <i class="fa-solid fa-cubes text-2xl text-emerald-400 mb-2 group-hover:scale-110 transition-transform"></i>
-          <p class="text-sm font-medium text-gray-200">Minecraft</p>
-        </div>
-        <div onclick="showSection('catalog')" class="glass-card p-4 rounded-xl hover:border-brand-500/50 cursor-pointer transition text-center group">
-          <i class="fa-solid fa-code text-2xl text-amber-400 mb-2 group-hover:scale-110 transition-transform"></i>
-          <p class="text-sm font-medium text-gray-200">Розробка</p>
-        </div>
-        <div onclick="showSection('catalog')" class="glass-card p-4 rounded-xl hover:border-brand-500/50 cursor-pointer transition text-center group">
-          <i class="fa-solid fa-shield text-2xl text-red-400 mb-2 group-hover:scale-110 transition-transform"></i>
-          <p class="text-sm font-medium text-gray-200">Інше</p>
         </div>
       </div>
     </section>
@@ -166,7 +144,6 @@
             <h2 class="text-xl font-bold text-white">Усі пропозиції (База даних)</h2>
             <span class="text-xs text-gray-400" id="productCount">Завантаження...</span>
           </div>
-
           <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
       </div>
@@ -207,64 +184,17 @@
           + Створити послугу
         </button>
       </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="glass-card p-5 rounded-xl border border-gray-800">
-          <span class="text-xs text-gray-400">Баланс доступний до виводу (Mono/Privat)</span>
-          <p class="text-2xl font-extrabold text-white mt-1">0.00 ₴</p>
-        </div>
-        <div class="glass-card p-5 rounded-xl border border-gray-800">
-          <span class="text-xs text-gray-400">Зароблено за весь час</span>
-          <p class="text-2xl font-extrabold text-brand-500 mt-1">0.00 ₴</p>
-        </div>
-        <div class="glass-card p-5 rounded-xl border border-gray-800">
-          <span class="text-xs text-gray-400">Рейтинг продавця</span>
-          <p class="text-2xl font-extrabold text-amber-400 mt-1">5.00 ★</p>
-        </div>
-      </div>
     </section>
 
     <!-- ADMIN PANEL -->
     <section id="sec-admin" class="hidden">
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-white">Панель адміністратора</h2>
-        <div class="bg-brand-500/10 border border-brand-500/30 text-brand-500 px-4 py-2 rounded-xl text-xs font-bold">
-          Комісія сервісу: <span class="text-white">3%</span>
-        </div>
-      </div>
-
       <div class="glass-card p-6 rounded-xl border border-emerald-500/20 mb-6">
-        <h3 class="text-md font-bold text-brand-500 mb-2"><i class="fa-solid fa-server mr-2"></i>Бекенд та База Даних</h3>
-        <p class="text-xs text-gray-400">Сервер SQLite працює на Node.js + Express. Авторизація через Telegram активна для всіх користувачів.</p>
+        <h3 class="text-md font-bold text-brand-500 mb-2"><i class="fa-solid fa-server mr-2"></i>Бекенд та Безпека</h3>
+        <p class="text-xs text-gray-400">Авторизація побудована через офіційний Telegram Login Widget (@dealpay_sec_bot).</p>
       </div>
     </section>
 
   </main>
-
-  <!-- MODAL AUTH (TELEGRAM) -->
-  <div id="modal-auth" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-    <div class="glass-card max-w-sm w-full p-6 rounded-2xl border border-gray-800 relative shadow-2xl">
-      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
-        <i class="fa-solid fa-xmark text-lg"></i>
-      </button>
-      <div class="text-center mb-4">
-        <div class="w-12 h-12 bg-brand-accent/10 text-brand-accent rounded-full flex items-center justify-center mx-auto mb-2 border border-brand-accent/20">
-          <i class="fa-brands fa-telegram text-2xl"></i>
-        </div>
-        <h3 id="authTitle" class="text-lg font-bold text-white">Вхід через Telegram</h3>
-        <p class="text-[11px] text-gray-400 mt-1">Введіть свій Telegram Username, щоб підтвердити особу та уникнути скаму.</p>
-      </div>
-      <div class="space-y-4 text-xs mb-6">
-        <div>
-          <label class="block text-gray-400 mb-1">Telegram Username</label>
-          <input type="text" id="authEmail" placeholder="@your_username" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-gray-200 focus:outline-none focus:border-brand-500">
-        </div>
-      </div>
-      <button onclick="submitAuth()" class="w-full bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold py-3 rounded-xl transition text-sm shadow-lg shadow-emerald-500/20">
-        Підтвердити вхід
-      </button>
-    </div>
-  </div>
 
   <!-- MODAL PAYMENT -->
   <div id="modal-pay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
@@ -350,6 +280,18 @@
     let selectedProduct = null;
     let allProducts = [];
 
+    // Функція викликається автоматично при успішному вході через віджет Telegram
+    function onTelegramAuth(user) {
+      currentUser = user.username ? '@' + user.username : '@id' + user.id;
+      
+      document.getElementById('userName').innerText = currentUser;
+      document.getElementById('authButtons').classList.add('hidden');
+      document.getElementById('userProfile').classList.remove('hidden');
+      document.getElementById('userProfile').classList.add('flex');
+      
+      alert(`Вітаємо, ${user.first_name}! Авторизація через Telegram успішна.`);
+    }
+
     async function loadProducts() {
       try {
         const res = await fetch('/api/products');
@@ -434,9 +376,7 @@
 
     async function addProductToDB() {
       if (!currentUser) {
-        alert('⚠️ Для створення послуги необхідно увійти через Telegram!');
-        openAuthModal('login');
-        return;
+        return alert('⚠️ Будь ласка, увійдіть через офіційний віджет Telegram у верхньому меню!');
       }
 
       const title = document.getElementById('newTitle').value;
@@ -461,9 +401,7 @@
 
     async function createOrderInDB() {
       if (!currentUser) {
-        alert('⚠️ Для оплати необхідно увійти через Telegram!');
-        openAuthModal('login');
-        return;
+        return alert('⚠️ Авторизуйтесь через Telegram для здійснення покупки!');
       }
       if(!selectedProduct) return;
 
@@ -518,9 +456,7 @@
 
     function openModal(title, price, seller) {
       if (!currentUser) {
-        alert('⚠️ Для купівлі послуги увійдіть через Telegram!');
-        openAuthModal('login');
-        return;
+        return alert('⚠️ Авторизуйтесь через Telegram зверху сторінки, щоб купувати товари!');
       }
 
       const fee = price * 0.03;
@@ -543,9 +479,7 @@
 
     function openCreateModal() {
       if (!currentUser) {
-        alert('⚠️ Щоб продавати послуги, увійдіть через Telegram!');
-        openAuthModal('login');
-        return;
+        return alert('⚠️ Натисніть кнопку входу Telegram вгорі сайту, щоб виставити послугу!');
       }
 
       document.getElementById('modal-create').classList.remove('hidden');
@@ -555,29 +489,6 @@
     function closeCreateModal() {
       document.getElementById('modal-create').classList.add('hidden');
       document.getElementById('modal-create').classList.remove('flex');
-    }
-
-    function openAuthModal(mode) {
-      document.getElementById('modal-auth').classList.remove('hidden');
-      document.getElementById('modal-auth').classList.add('flex');
-    }
-
-    function closeAuthModal() {
-      document.getElementById('modal-auth').classList.add('hidden');
-      document.getElementById('modal-auth').classList.remove('flex');
-    }
-
-    function submitAuth() {
-      const name = document.getElementById('authEmail').value.trim();
-      if(!name) return alert('Введіть Telegram Username!');
-      
-      currentUser = name.startsWith('@') ? name : '@' + name;
-      document.getElementById('userName').innerText = currentUser;
-      document.getElementById('authButtons').classList.add('hidden');
-      document.getElementById('userProfile').classList.remove('hidden');
-      document.getElementById('userProfile').classList.add('flex');
-      
-      closeAuthModal();
     }
 
     function logout() {
