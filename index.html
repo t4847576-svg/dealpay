@@ -11,10 +11,7 @@
       theme: {
         extend: {
           colors: {
-            brand: {
-              50: '#ecfdf5', 100: '#d1fae5', 500: '#10b981', 600: '#059669', 700: '#047857',
-              accent: '#06b6d4', bg: '#0a0e17', card: '#141b2d', border: '#1f293d'
-            }
+            brand: { 50: '#ecfdf5', 100: '#d1fae5', 500: '#10b981', 600: '#059669', 700: '#047857', accent: '#06b6d4', bg: '#0a0e17', card: '#141b2d', border: '#1f293d' }
           }
         }
       }
@@ -32,28 +29,25 @@
 </head>
 <body class="custom-scrollbar">
 
-  <!-- Navigation -->
+  <!-- Header -->
   <header class="sticky top-0 z-50 glass-card border-b border-gray-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
       <div class="flex items-center space-x-8">
-        <a href="#" onclick="showSection('home')" class="flex items-center space-x-3 cursor-pointer">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-500 to-brand-accent flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-emerald-500/20">D</div>
-          <span class="text-xl font-bold tracking-tight text-white">Deal<span class="text-brand-500">Pay</span></span>
+        <a href="#" onclick="showSection('home')" class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-500 to-brand-accent flex items-center justify-center text-slate-950 font-black text-xl shadow-lg">D</div>
+          <span class="text-xl font-bold text-white">Deal<span class="text-brand-500">Pay</span></span>
         </a>
         <nav class="hidden md:flex space-x-6 text-sm font-medium text-gray-300">
-          <button onclick="showSection('catalog')" class="hover:text-brand-500 transition">Каталог</button>
-          <button onclick="showSection('buyer')" class="hover:text-brand-500 transition">Мої покупки</button>
-          <button onclick="showSection('seller')" class="hover:text-brand-500 transition">Кабінет продавця</button>
+          <button onclick="showSection('catalog')" class="hover:text-brand-500">Каталог</button>
+          <button onclick="showSection('buyer')" class="hover:text-brand-500">Мої покупки</button>
+          <button onclick="showSection('seller')" class="hover:text-brand-500">Кабінет продавця</button>
+          <button onclick="showSection('support')" class="hover:text-brand-500">Підтримка</button>
+          <button id="adminNavBtn" onclick="showSection('admin')" class="hidden text-amber-400 font-bold hover:underline"><i class="fa-solid fa-user-shield mr-1"></i> Адмінка</button>
         </nav>
       </div>
 
       <div class="flex items-center space-x-4">
-        <div class="relative hidden sm:block w-56">
-          <input type="text" id="searchInput" oninput="filterProducts()" placeholder="Пошук аккаунтів, валюти..." class="w-full bg-slate-900/90 border border-gray-800 rounded-lg py-2 pl-9 pr-4 text-xs text-gray-200 focus:outline-none focus:border-brand-500 transition">
-          <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-500 text-xs"></i>
-        </div>
-
-        <div id="authButtons" class="flex items-center">
+        <div id="authButtons">
           <script async src="https://telegram.org/js/telegram-widget.js?22" 
                   data-telegram-login="dealpay_sec_bot" 
                   data-size="medium" 
@@ -68,220 +62,140 @@
           <button onclick="logout()" class="text-xs text-gray-400 hover:text-red-400 ml-2"><i class="fa-solid fa-right-from-bracket"></i></button>
         </div>
 
-        <button onclick="openCreateModal()" class="bg-brand-500 hover:bg-brand-600 text-slate-950 font-semibold px-4 py-2 rounded-lg text-sm transition shadow-lg shadow-emerald-500/20">
+        <button onclick="openCreateModal()" class="bg-brand-500 hover:bg-brand-600 text-slate-950 font-semibold px-4 py-2 rounded-lg text-sm transition">
           <i class="fa-solid fa-plus mr-1"></i> Продати
         </button>
       </div>
     </div>
   </header>
 
-  <!-- MAIN CONTAINER -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <main class="max-w-7xl mx-auto px-4 py-8">
 
-    <!-- HOME SECTION -->
+    <!-- HOME -->
     <section id="sec-home">
-      <div class="relative rounded-2xl glass-card p-8 md:p-12 mb-10 overflow-hidden border border-gray-800/80 glow-emerald">
-        <div class="absolute -top-24 -right-24 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl"></div>
-        <div class="relative z-10 max-w-2xl">
-          <span class="bg-brand-500/10 text-brand-500 text-xs font-semibold px-3 py-1 rounded-full border border-brand-500/20 mb-4 inline-block">
-            🛡️ Safe-Escrow Захист угод (Комісія 3%)
-          </span>
-          <h1 class="text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4">
-            Безпечний маркетплейс ігрових цінностей
-          </h1>
-          <p class="text-gray-400 text-base mb-6">
-            Купуйте та продавайте аккаунти, вірти та скіни в CS2, GTA 5 RP, Minecraft та Telegram з гарантією безпеки.
-          </p>
-          <div class="flex flex-wrap gap-4">
-            <button onclick="showSection('catalog')" class="bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold px-6 py-3 rounded-xl transition shadow-lg shadow-emerald-500/20">
-              Перейти до каталогу
-            </button>
-            <button onclick="openCreateModal()" class="bg-slate-900 hover:bg-slate-800 text-gray-200 font-semibold px-6 py-3 rounded-xl border border-gray-700 transition">
-              Створити оголошення
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <h2 class="text-xl font-bold text-white mb-6">Категорії ігор</h2>
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
-        <div onclick="filterByCategory('CS2')" class="glass-card p-5 rounded-xl hover:border-brand-500/50 cursor-pointer transition text-center group">
-          <i class="fa-solid fa-gun text-3xl text-brand-500 mb-2 group-hover:scale-110 transition-transform"></i>
-          <p class="text-sm font-bold text-white">Counter-Strike 2</p>
-        </div>
-        <div onclick="filterByCategory('GTA 5 RP')" class="glass-card p-5 rounded-xl hover:border-brand-500/50 cursor-pointer transition text-center group">
-          <i class="fa-solid fa-car text-3xl text-brand-accent mb-2 group-hover:scale-110 transition-transform"></i>
-          <p class="text-sm font-bold text-white">GTA 5 RP</p>
-        </div>
-        <div onclick="filterByCategory('Minecraft')" class="glass-card p-5 rounded-xl hover:border-brand-500/50 cursor-pointer transition text-center group">
-          <i class="fa-solid fa-cubes text-3xl text-emerald-400 mb-2 group-hover:scale-110 transition-transform"></i>
-          <p class="text-sm font-bold text-white">Minecraft</p>
-        </div>
-        <div onclick="filterByCategory('Telegram')" class="glass-card p-5 rounded-xl hover:border-brand-500/50 cursor-pointer transition text-center group">
-          <i class="fa-brands fa-telegram text-3xl text-sky-400 mb-2 group-hover:scale-110 transition-transform"></i>
-          <p class="text-sm font-bold text-white">Telegram</p>
-        </div>
+      <div class="relative rounded-2xl glass-card p-8 md:p-12 mb-10 border border-gray-800 glow-emerald">
+        <h1 class="text-4xl font-extrabold text-white mb-4">Ігровий маркетплейс акаунтів та цінностей</h1>
+        <p class="text-gray-400 mb-6">Купуйте та продавайте товари в CS2, GTA 5 RP, Minecraft та Telegram з гарантією Safe-Escrow.</p>
+        <button onclick="showSection('catalog')" class="bg-brand-500 text-slate-950 font-bold px-6 py-3 rounded-xl">Перейти до каталогу</button>
       </div>
     </section>
 
-    <!-- CATALOG SECTION -->
+    <!-- CATALOG -->
     <section id="sec-catalog" class="hidden">
-      <div class="flex flex-col md:flex-row gap-8">
-        <aside class="w-full md:w-64 space-y-6 shrink-0">
-          <div class="glass-card p-5 rounded-xl border border-gray-800">
-            <h3 class="font-bold text-white mb-4 text-sm flex items-center justify-between">Фільтри <i class="fa-solid fa-sliders text-brand-500"></i></h3>
-            <div class="space-y-2 text-xs">
-              <button onclick="filterByCategory('')" class="w-full text-left p-2 rounded hover:bg-slate-800 text-gray-300 transition">🌟 Усі товари</button>
-              <button onclick="filterByCategory('CS2')" class="w-full text-left p-2 rounded hover:bg-slate-800 text-gray-300 transition">🎮 Counter-Strike 2</button>
-              <button onclick="filterByCategory('GTA 5 RP')" class="w-full text-left p-2 rounded hover:bg-slate-800 text-gray-300 transition">🚗 GTA 5 RP</button>
-              <button onclick="filterByCategory('Minecraft')" class="w-full text-left p-2 rounded hover:bg-slate-800 text-gray-300 transition">🧱 Minecraft</button>
-              <button onclick="filterByCategory('Telegram')" class="w-full text-left p-2 rounded hover:bg-slate-800 text-gray-300 transition">🤖 Telegram</button>
-            </div>
-          </div>
-        </aside>
-
-        <div class="flex-1">
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-bold text-white">Каталог оголошень</h2>
-            <span class="text-xs text-gray-400" id="productCount">Завантаження...</span>
-          </div>
-          <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- BUYER DASHBOARD -->
-    <section id="sec-buyer" class="hidden">
-      <h2 class="text-2xl font-bold text-white mb-6">Кабінет покупця</h2>
-      <div class="glass-card rounded-xl p-6 border border-gray-800 mb-8">
-        <h3 class="text-lg font-semibold text-white mb-4">Мої активні угоди в Escrow</h3>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs text-gray-300">
-            <thead class="bg-slate-900/80 uppercase text-gray-400 text-[10px]">
-              <tr>
-                <th class="p-3">ID</th>
-                <th class="p-3">Товар</th>
-                <th class="p-3">Продавець</th>
-                <th class="p-3">Сума + 3%</th>
-                <th class="p-3">Статус</th>
-                <th class="p-3 text-right">Дія</th>
-              </tr>
-            </thead>
-            <tbody id="buyerOrdersList" class="divide-y divide-gray-800">
-              <tr><td colspan="6" class="p-4 text-center text-gray-500">Завантаження...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- SELLER DASHBOARD -->
-    <section id="sec-seller" class="hidden">
       <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-white">Кабінет продавця</h2>
-        <button onclick="openCreateModal()" class="bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm transition shadow-lg shadow-emerald-500/20">
-          + Створити оголошення (з фото)
-        </button>
+        <h2 class="text-xl font-bold text-white">Каталог оголошень</h2>
+        <span id="productCount" class="text-xs text-gray-400"></span>
       </div>
+      <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </section>
 
+    <!-- BUYER -->
+    <section id="sec-buyer" class="hidden">
+      <h2 class="text-2xl font-bold text-white mb-6">Мої покупки</h2>
+      <div class="glass-card rounded-xl p-6 border border-gray-800">
+        <table class="w-full text-left text-xs text-gray-300">
+          <thead class="bg-slate-900 uppercase text-gray-400">
+            <tr><th class="p-3">ID</th><th class="p-3">Товар</th><th class="p-3">Продавець</th><th class="p-3">Сума</th><th class="p-3">Статус</th><th class="p-3 text-right">Дія</th></tr>
+          </thead>
+          <tbody id="buyerOrdersList" class="divide-y divide-gray-800"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SELLER -->
+    <section id="sec-seller" class="hidden">
+      <h2 class="text-2xl font-bold text-white mb-6">Кабінет продавця</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="glass-card p-5 rounded-xl border border-gray-800">
-          <span class="text-xs text-gray-400">Доступно до виводу (Mono/Privat)</span>
+          <span class="text-xs text-gray-400">Доступно до виводу</span>
           <p id="sellerBalance" class="text-2xl font-extrabold text-white mt-1">0.00 ₴</p>
-          <button onclick="requestWithdrawal()" class="mt-3 bg-slate-800 hover:bg-slate-700 text-brand-500 font-semibold px-3 py-1.5 rounded-lg text-xs border border-gray-700 transition">Вивести кошти</button>
         </div>
-        <div class="glass-card p-5 rounded-xl border border-gray-800">
-          <span class="text-xs text-gray-400">Всього зароблено</span>
-          <p id="sellerEarned" class="text-2xl font-extrabold text-brand-500 mt-1">0.00 ₴</p>
+      </div>
+    </section>
+
+    <!-- SUPPORT (Для звичайних користувачів) -->
+    <section id="sec-support" class="hidden">
+      <h2 class="text-2xl font-bold text-white mb-6">Служба підтримки</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="glass-card p-6 rounded-xl border border-gray-800">
+          <h3 class="font-bold text-white mb-4">Написати запитання</h3>
+          <textarea id="ticketMsg" rows="4" placeholder="Опишіть вашу проблему..." class="w-full bg-slate-900 border border-gray-800 rounded-lg p-3 text-xs text-gray-200 mb-4"></textarea>
+          <button onclick="sendTicket()" class="bg-brand-500 text-slate-950 font-bold px-4 py-2 rounded-lg text-xs">Надіслати запит</button>
         </div>
-        <div class="glass-card p-5 rounded-xl border border-gray-800">
-          <span class="text-xs text-gray-400">Рейтинг продавця</span>
-          <p class="text-2xl font-extrabold text-amber-400 mt-1">5.00 ★</p>
+        <div class="glass-card p-6 rounded-xl border border-gray-800">
+          <h3 class="font-bold text-white mb-4">Мої звернення</h3>
+          <div id="myTicketsList" class="space-y-3 text-xs"></div>
         </div>
+      </div>
+    </section>
+
+    <!-- ADMIN PANEL (Тільки для вас) -->
+    <section id="sec-admin" class="hidden">
+      <div class="flex items-center space-x-3 mb-6">
+        <h2 class="text-2xl font-bold text-amber-400"><i class="fa-solid fa-user-shield"></i> Панель Адміністратора</h2>
+        <span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs px-3 py-1 rounded-full font-semibold">Вхід: @Salxanich</span>
+      </div>
+
+      <!-- Вкладки Адмінки -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        <!-- Запити підтримки -->
+        <div class="glass-card p-6 rounded-xl border border-gray-800">
+          <h3 class="font-bold text-white mb-4 flex items-center justify-between">
+            <span><i class="fa-solid fa-headset text-brand-500 mr-2"></i> Вхідні тикети підтримки</span>
+            <button onclick="loadAdminTickets()" class="text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-rotate-right"></i></button>
+          </h3>
+          <div id="adminTicketsList" class="space-y-4 max-h-[500px] overflow-y-auto custom-scrollbar"></div>
+        </div>
+
+        <!-- Скарги на товари та людей -->
+        <div class="glass-card p-6 rounded-xl border border-gray-800">
+          <h3 class="font-bold text-white mb-4 flex items-center justify-between">
+            <span><i class="fa-solid fa-triangle-exclamation text-red-500 mr-2"></i> Скарги від користувачів</span>
+            <button onclick="loadAdminReports()" class="text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-rotate-right"></i></button>
+          </h3>
+          <div id="adminReportsList" class="space-y-4 max-h-[500px] overflow-y-auto custom-scrollbar"></div>
+        </div>
+
       </div>
     </section>
 
   </main>
 
-  <!-- MODAL PAYMENT -->
-  <div id="modal-pay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-    <div class="glass-card max-w-md w-full p-6 rounded-2xl border border-gray-800 relative shadow-2xl">
-      <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-
-      <div class="text-center mb-6">
-        <div class="w-12 h-12 bg-brand-500/10 text-brand-500 rounded-full flex items-center justify-center mx-auto mb-3 border border-brand-500/20">
-          <i class="fa-solid fa-shield-halved text-xl"></i>
-        </div>
-        <h3 class="text-lg font-bold text-white">Оплата через платіжний шлюз</h3>
-        <p class="text-xs text-gray-400 mt-1">Безпечна угода Safe-Escrow</p>
+  <!-- MODAL CREATE PRODUCT -->
+  <div id="modal-create" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="glass-card max-w-lg w-full p-6 rounded-2xl border border-gray-800 relative">
+      <button onclick="closeCreateModal()" class="absolute top-4 right-4 text-gray-400"><i class="fa-solid fa-xmark"></i></button>
+      <h3 class="text-lg font-bold text-white mb-4">Створити оголошення</h3>
+      <div class="space-y-3 text-xs mb-6">
+        <input type="text" id="newTitle" placeholder="Назва товару" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-gray-200">
+        <select id="newCategory" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-gray-200">
+          <option value="CS2">CS2</option><option value="GTA 5 RP">GTA 5 RP</option><option value="Minecraft">Minecraft</option><option value="Telegram">Telegram</option>
+        </select>
+        <input type="number" id="newPrice" placeholder="Ціна (₴)" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-gray-200">
+        <textarea id="newDesc" rows="3" placeholder="Опис" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-gray-200"></textarea>
+        <input type="file" id="productPhotos" multiple accept="image/*" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2 text-gray-200">
       </div>
-
-      <div class="space-y-3 text-xs bg-slate-900/90 p-4 rounded-xl border border-gray-800 mb-6">
-        <div class="flex justify-between text-gray-300"><span>Товар:</span><span id="payModalTitle" class="font-semibold text-white">-</span></div>
-        <div class="flex justify-between text-gray-300"><span>Ціна:</span><span id="payModalBasePrice" class="font-semibold text-white">0 ₴</span></div>
-        <div class="flex justify-between text-gray-300"><span>Комісія (3%):</span><span id="payModalFee" class="font-semibold text-brand-500">0 ₴</span></div>
-        <div class="border-t border-gray-800 pt-2 flex justify-between text-sm font-bold text-white"><span>До сплати:</span><span id="payModalTotal" class="text-brand-500">0 ₴</span></div>
-      </div>
-
-      <div class="space-y-2">
-        <button onclick="processPayment('monobank')" class="w-full bg-black hover:bg-gray-900 text-white font-bold py-3 rounded-xl transition text-sm border border-gray-800 flex items-center justify-center space-x-2">
-          <span>Сплатити через Monobank</span>
-        </button>
-        <button onclick="processPayment('privatbank')" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 rounded-xl transition text-sm flex items-center justify-center space-x-2">
-          <span>Приват24 / LiqPay</span>
-        </button>
-      </div>
+      <button onclick="addProductToDB()" class="w-full bg-brand-500 text-slate-950 font-bold py-3 rounded-xl text-sm">Опублікувати</button>
     </div>
   </div>
 
-  <!-- MODAL CREATE PRODUCT WITH FILE UPLOAD -->
-  <div id="modal-create" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-    <div class="glass-card max-w-lg w-full p-6 rounded-2xl border border-gray-800 relative shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
-      <button onclick="closeCreateModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-
-      <h3 class="text-lg font-bold text-white mb-4">Створити оголошення (завантаження фото)</h3>
-      
-      <div class="space-y-3 text-xs mb-6">
-        <div>
-          <label class="block text-gray-400 mb-1">Назва товару</label>
-          <input type="text" id="newTitle" placeholder="Наприклад: Аккаунт CS2 Prime" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-gray-200">
-        </div>
-        <div>
-          <label class="block text-gray-400 mb-1">Гра / Категорія</label>
-          <select id="newCategory" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-gray-200">
-            <option value="CS2">Counter-Strike 2</option>
-            <option value="GTA 5 RP">GTA 5 RP</option>
-            <option value="Minecraft">Minecraft</option>
-            <option value="Telegram">Telegram</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-gray-400 mb-1">Ціна (₴)</label>
-          <input type="number" id="newPrice" placeholder="500" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-gray-200">
-        </div>
-        <div>
-          <label class="block text-gray-400 mb-1">Опис товару</label>
-          <textarea id="newDesc" rows="3" placeholder="Опишіть характеристики..." class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-gray-200"></textarea>
-        </div>
-
-        <!-- Загрузка файлов с устройства (до 10 штук) -->
-        <div>
-          <label class="block text-gray-400 mb-1">Виберіть фотографії (до 10 штук)</label>
-          <input type="file" id="productPhotos" multiple accept="image/*" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2 text-gray-200 file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-brand-500 file:text-slate-950 hover:file:bg-brand-600">
-          <span class="text-[10px] text-gray-500 mt-1 block">Можна обрати кілька фото одразу з телефона чи ПК.</span>
-        </div>
-      </div>
-
-      <button onclick="addProductToDB()" class="w-full bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold py-3 rounded-xl transition text-sm shadow-lg shadow-emerald-500/20">
-        Опублікувати товар
-      </button>
+  <!-- MODAL REPORT -->
+  <div id="modal-report" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="glass-card max-w-md w-full p-6 rounded-2xl border border-gray-800 relative">
+      <button onclick="closeReportModal()" class="absolute top-4 right-4 text-gray-400"><i class="fa-solid fa-xmark"></i></button>
+      <h3 class="text-lg font-bold text-white mb-4">Подати скаргу</h3>
+      <input type="hidden" id="reportTargetId">
+      <input type="hidden" id="reportTargetType">
+      <textarea id="reportReason" rows="3" placeholder="Причина скарги (скам, фейк, образа)..." class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-xs text-gray-200 mb-4"></textarea>
+      <button onclick="submitReport()" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 rounded-xl text-xs">Надіслати скаргу</button>
     </div>
   </div>
 
   <script>
     let currentUser = null;
-    let selectedProduct = null;
     let allProducts = [];
+    const ADMIN_USER = '@Salxanich';
 
     function onTelegramAuth(user) {
       currentUser = '@' + user.username;
@@ -289,194 +203,187 @@
       document.getElementById('authButtons').classList.add('hidden');
       document.getElementById('userProfile').classList.remove('hidden');
       document.getElementById('userProfile').classList.add('flex');
-      loadSellerBalance();
-      alert(`Вітаємо, ${user.first_name}!`);
+
+      if (currentUser.toLowerCase() === ADMIN_USER.toLowerCase()) {
+        document.getElementById('adminNavBtn').classList.remove('hidden');
+      }
+      loadProducts();
     }
 
     async function loadProducts() {
-      try {
-        const res = await fetch('/api/products');
-        allProducts = await res.json();
-        renderProducts(allProducts);
-      } catch (err) { console.error(err); }
-    }
-
-    async function loadOrders() {
-      try {
-        const res = await fetch('/api/orders');
-        const orders = await res.json();
-        const tbody = document.getElementById('buyerOrdersList');
-        if (orders.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">Немає угод</td></tr>';
-          return;
-        }
-        tbody.innerHTML = '';
-        orders.forEach(o => {
-          const isCompleted = o.status === 'completed';
-          tbody.innerHTML += `
-            <tr>
-              <td class="p-3 font-mono">${o.order_code}</td>
-              <td class="p-3 font-medium text-white">${o.product_title}</td>
-              <td class="p-3">${o.seller}</td>
-              <td class="p-3 font-bold text-white">${o.total.toFixed(2)} ₴</td>
-              <td class="p-3"><span class="${isCompleted ? 'text-emerald-400 bg-emerald-500/10' : 'text-amber-400 bg-amber-500/10'} px-2 py-0.5 rounded text-[10px] border">${isCompleted ? 'Виплачено' : 'В Escrow'}</span></td>
-              <td class="p-3 text-right">
-                ${!isCompleted ? `<button onclick="completeOrder('${o.order_code}')" class="bg-brand-500 text-slate-950 px-2.5 py-1 rounded font-semibold">Отримав товар</button>` : '<span>Закрито</span>'}
-              </td>
-            </tr>`;
-        });
-      } catch (err) { console.error(err); }
-    }
-
-    async function loadSellerBalance() {
-      if (!currentUser) return;
-      try {
-        const res = await fetch(`/api/balance/${encodeURIComponent(currentUser)}`);
-        const data = await res.json();
-        document.getElementById('sellerBalance').innerText = `${data.available.toFixed(2)} ₴`;
-        document.getElementById('sellerEarned').innerText = `${data.earned.toFixed(2)} ₴`;
-      } catch(e) {}
+      const res = await fetch('/api/products');
+      allProducts = await res.json();
+      renderProducts(allProducts);
     }
 
     function renderProducts(items) {
       const grid = document.getElementById('productsGrid');
       grid.innerHTML = '';
-      if(items.length === 0) {
-        grid.innerHTML = '<p class="text-gray-500 text-sm">Товарів поки немає.</p>';
-        document.getElementById('productCount').innerText = `Лотів: 0`;
-        return;
-      }
-
       items.forEach(p => {
         const mainImg = p.images && p.images.length > 0 ? p.images[0] : 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500';
+        const isAdmin = currentUser && currentUser.toLowerCase() === ADMIN_USER.toLowerCase();
+        
         grid.innerHTML += `
-          <div class="glass-card rounded-xl border border-gray-800 hover:border-brand-500/40 transition overflow-hidden group flex flex-col justify-between">
+          <div class="glass-card rounded-xl border border-gray-800 overflow-hidden flex flex-col justify-between">
             <div>
-              <div class="h-44 overflow-hidden bg-slate-900 relative">
-                <img src="${mainImg}" alt="img" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+              <div class="h-44 bg-slate-900 relative">
+                <img src="${mainImg}" class="w-full h-full object-cover">
                 <span class="absolute top-2 left-2 bg-slate-950/80 text-brand-400 text-[10px] px-2.5 py-1 rounded-full border border-brand-500/20">${p.category}</span>
-                ${p.images && p.images.length > 1 ? `<span class="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] px-2 py-0.5 rounded">📷 ${p.images.length}</span>` : ''}
+                <button onclick="openReportModal('product', ${p.id})" class="absolute top-2 right-2 text-red-400 bg-slate-950/80 p-1.5 rounded-lg hover:text-red-300" title="Поскаржитися"><i class="fa-solid fa-flag text-xs"></i></button>
               </div>
               <div class="p-4">
-                <h3 class="font-semibold text-white group-hover:text-brand-500 transition line-clamp-1 text-sm mb-1">${p.title}</h3>
+                <h3 class="font-semibold text-white text-sm mb-1">${p.title}</h3>
                 <p class="text-xs text-gray-400 line-clamp-2 mb-3">${p.desc || ''}</p>
-                <span class="text-[10px] text-gray-500">Продавець: ${p.seller}</span>
+                <div class="flex justify-between items-center text-[10px] text-gray-500">
+                  <span>Продавець: ${p.seller}</span>
+                  <button onclick="openReportModal('user', '${p.seller}')" class="text-red-400 hover:underline">Скарга на продавця</button>
+                </div>
               </div>
             </div>
             <div class="p-4 border-t border-gray-800 bg-slate-950/40 flex items-center justify-between">
-              <div><span class="text-xs text-gray-500 block">Ціна</span><span class="text-lg font-extrabold text-white">${p.price} ₴</span></div>
-              <button onclick="openModal('${p.title}', ${p.price}, '${p.seller}')" class="bg-brand-500/10 hover:bg-brand-500 text-brand-500 hover:text-slate-950 font-semibold px-3 py-1.5 rounded-lg text-xs transition border border-brand-500/30">Купити</button>
+              <span class="text-lg font-extrabold text-white">${p.price} ₴</span>
+              <div class="flex space-x-2">
+                ${isAdmin ? `<button onclick="deleteProductByAdmin(${p.id})" class="bg-red-500/20 text-red-400 border border-red-500/30 px-2.5 py-1.5 rounded-lg text-xs font-semibold">Видалити</button>` : ''}
+                <button class="bg-brand-500/10 text-brand-500 px-3 py-1.5 rounded-lg text-xs font-semibold border border-brand-500/30">Купити</button>
+              </div>
             </div>
           </div>`;
       });
-      document.getElementById('productCount').innerText = `Лотів: ${items.length}`;
     }
 
     async function addProductToDB() {
       if (!currentUser) return alert('Увійдіть через Telegram!');
-      
-      const title = document.getElementById('newTitle').value;
-      const category = document.getElementById('newCategory').value;
-      const price = document.getElementById('newPrice').value;
-      const desc = document.getElementById('newDesc').value;
-      const photoInput = document.getElementById('productPhotos');
-
-      if (!title || !price) return alert('Заповніть назву та ціну!');
-
-      // Собираем данные через FormData для отправки файлов на сервер
       const formData = new FormData();
-      formData.append('title', title);
-      formData.append('category', category);
-      formData.append('price', price);
-      formData.append('desc', desc);
+      formData.append('title', document.getElementById('newTitle').value);
+      formData.append('category', document.getElementById('newCategory').value);
+      formData.append('price', document.getElementById('newPrice').value);
+      formData.append('desc', document.getElementById('newDesc').value);
       formData.append('seller', currentUser);
+      const photos = document.getElementById('productPhotos').files;
+      for (let i = 0; i < photos.length; i++) formData.append('photos', photos[i]);
 
-      for (let i = 0; i < photoInput.files.length; i++) {
-        formData.append('photos', photoInput.files[i]);
-      }
-
-      const res = await fetch('/api/products', {
-        method: 'POST',
-        body: formData
-      });
-
-      if (res.ok) {
-        closeCreateModal();
-        loadProducts();
-        showSection('catalog');
-      } else {
-        alert('Помилка при завантаженні товарів');
-      }
+      await fetch('/api/products', { method: 'POST', body: formData });
+      closeCreateModal();
+      loadProducts();
     }
 
-    function openModal(title, price, seller) {
-      if (!currentUser) return alert('Увійдіть через Telegram для покупки!');
-      selectedProduct = { title, price, seller };
-      document.getElementById('payModalTitle').innerText = title;
-      document.getElementById('payModalBasePrice').innerText = price + ' ₴';
-      document.getElementById('payModalFee').innerText = (price * 0.03).toFixed(2) + ' ₴';
-      document.getElementById('payModalTotal').innerText = (price * 1.03).toFixed(2) + ' ₴';
-      document.getElementById('modal-pay').classList.remove('hidden');
-      document.getElementById('modal-pay').classList.add('flex');
+    // СКАРГИ
+    function openReportModal(type, id) {
+      if (!currentUser) return alert('Увійдіть через Telegram!');
+      document.getElementById('reportTargetType').value = type;
+      document.getElementById('reportTargetId').value = id;
+      document.getElementById('modal-report').classList.remove('hidden');
+      document.getElementById('modal-report').classList.add('flex');
     }
+    function closeReportModal() { document.getElementById('modal-report').classList.add('hidden'); }
 
-    async function processPayment(gateway) {
-      if (!selectedProduct) return;
-      await fetch('/api/orders/create', {
+    async function submitReport() {
+      const type = document.getElementById('reportTargetType').value;
+      const id = document.getElementById('reportTargetId').value;
+      const reason = document.getElementById('reportReason').value;
+      await fetch('/api/reports', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          product_title: selectedProduct.title,
-          price: selectedProduct.price,
-          buyer: currentUser,
-          seller: selectedProduct.seller
-        })
+        body: JSON.stringify({ reporter: currentUser, target_type: type, target_id: id, reason })
       });
-      document.getElementById('modal-pay').classList.add('hidden');
-      document.getElementById('modal-pay').classList.remove('flex');
-      showSection('buyer');
-      alert(`Оплату через ${gateway} імітовано! Кошти в Escrow.`);
-      loadOrders();
+      closeReportModal();
+      alert('Скаргу надіслано модератору!');
     }
 
-    async function completeOrder(code) {
-      await fetch('/api/orders/complete', {
+    // ПІДТРИМКА
+    async function sendTicket() {
+      if (!currentUser) return alert('Увійдіть через Telegram!');
+      const msg = document.getElementById('ticketMsg').value;
+      if (!msg) return;
+      await fetch('/api/support/ticket', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ order_code: code })
+        body: JSON.stringify({ user: currentUser, message: msg })
       });
-      loadOrders();
-      alert('Угоду завершено! Кошти зараховані продавцю.');
+      document.getElementById('ticketMsg').value = '';
+      loadMyTickets();
+      alert('Запит надіслано в підтримку!');
     }
 
-    function requestWithdrawal() {
-      alert('Запит на вихід коштів на Mono/Privat надіслано!');
+    async function loadMyTickets() {
+      if (!currentUser) return;
+      const res = await fetch(`/api/support/my-tickets/${encodeURIComponent(currentUser)}`);
+      const tickets = await res.json();
+      const div = document.getElementById('myTicketsList');
+      div.innerHTML = tickets.map(t => `
+        <div class="p-3 bg-slate-900 border border-gray-800 rounded-lg">
+          <p class="text-white font-medium mb-1">${t.message}</p>
+          ${t.reply ? `<p class="text-brand-500 mt-2 bg-brand-500/10 p-2 rounded border border-brand-500/20"><strong>Відповідь підтримки:</strong> ${t.reply}</p>` : '<span class="text-amber-400 text-[10px]">Очікує відповіді...</span>'}
+        </div>
+      `).join('');
     }
 
-    function filterByCategory(cat) {
-      showSection('catalog');
-      if (!cat) return renderProducts(allProducts);
-      renderProducts(allProducts.filter(p => p.category === cat));
+    // ФУНКЦІЇ АДМІНІСТРАТОРА
+    async function deleteProductByAdmin(id) {
+      if (!confirm('Видалити це оголошення?')) return;
+      await fetch(`/api/admin/products/${id}`, {
+        method: 'DELETE',
+        headers: { 'x-user-name': currentUser }
+      });
+      loadProducts();
     }
 
-    function filterProducts() {
-      const q = document.getElementById('searchInput').value.toLowerCase();
-      renderProducts(allProducts.filter(p => p.title.toLowerCase().includes(q)));
+    async function loadAdminTickets() {
+      const res = await fetch('/api/admin/tickets', { headers: { 'x-user-name': currentUser } });
+      const tickets = await res.json();
+      const div = document.getElementById('adminTicketsList');
+      div.innerHTML = tickets.map(t => `
+        <div class="p-4 bg-slate-900 border border-gray-800 rounded-xl space-y-2">
+          <div class="flex justify-between text-xs"><span class="font-bold text-brand-500">${t.user}</span><span class="text-gray-500">${t.created_at}</span></div>
+          <p class="text-white text-xs">${t.message}</p>
+          ${t.reply ? `<p class="text-gray-400 text-xs italic">Відповідь: ${t.reply}</p>` : `
+            <div class="flex space-x-2 pt-2">
+              <input type="text" id="reply-${t.id}" placeholder="Введіть відповідь..." class="flex-1 bg-slate-950 border border-gray-800 rounded p-1.5 text-xs text-white">
+              <button onclick="replyTicket(${t.id})" class="bg-brand-500 text-slate-950 px-3 py-1.5 rounded font-bold text-xs">Відповісти</button>
+            </div>
+          `}
+        </div>
+      `).join('');
+    }
+
+    async function replyTicket(id) {
+      const reply = document.getElementById(`reply-${id}`).value;
+      if (!reply) return;
+      await fetch('/api/admin/tickets/reply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-user-name': currentUser },
+        body: JSON.stringify({ id, reply })
+      });
+      loadAdminTickets();
+    }
+
+    async function loadAdminReports() {
+      const res = await fetch('/api/admin/reports', { headers: { 'x-user-name': currentUser } });
+      const reports = await res.json();
+      const div = document.getElementById('adminReportsList');
+      div.innerHTML = reports.map(r => `
+        <div class="p-4 bg-slate-900 border border-gray-800 rounded-xl space-y-2">
+          <div class="flex justify-between text-xs">
+            <span class="font-bold text-red-400">Тип: ${r.target_type} (ID: ${r.target_id})</span>
+            <span class="text-gray-500">Від: ${r.reporter}</span>
+          </div>
+          <p class="text-white text-xs">Причина: ${r.reason}</p>
+          ${r.target_type === 'product' ? `<button onclick="deleteProductByAdmin(${r.target_id})" class="bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1 rounded text-xs font-semibold">Видалити товар</button>` : ''}
+        </div>
+      `).join('');
     }
 
     function showSection(id) {
-      ['home', 'catalog', 'buyer', 'seller'].forEach(s => document.getElementById('sec-' + s).classList.add('hidden'));
+      ['home', 'catalog', 'buyer', 'seller', 'support', 'admin'].forEach(s => document.getElementById('sec-' + s).classList.add('hidden'));
       document.getElementById('sec-' + id).classList.remove('hidden');
-      if(id === 'catalog') loadProducts();
-      if(id === 'buyer') loadOrders();
-      if(id === 'seller') loadSellerBalance();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (id === 'catalog') loadProducts();
+      if (id === 'support') loadMyTickets();
+      if (id === 'admin') { loadAdminTickets(); loadAdminReports(); }
     }
 
-    function closeModal() { document.getElementById('modal-pay').classList.add('hidden'); document.getElementById('modal-pay').classList.remove('flex'); }
-    function openCreateModal() { if (!currentUser) return alert('Увійдіть через Telegram!'); document.getElementById('modal-create').classList.remove('hidden'); document.getElementById('modal-create').classList.add('flex'); }
-    function closeCreateModal() { document.getElementById('modal-create').classList.add('hidden'); document.getElementById('modal-create').classList.remove('flex'); }
-    function logout() { currentUser = null; document.getElementById('authButtons').classList.remove('hidden'); document.getElementById('userProfile').classList.add('hidden'); }
+    function openCreateModal() { document.getElementById('modal-create').classList.remove('hidden'); document.getElementById('modal-create').classList.add('flex'); }
+    function closeCreateModal() { document.getElementById('modal-create').classList.add('hidden'); }
+    function logout() { currentUser = null; document.getElementById('authButtons').classList.remove('hidden'); document.getElementById('userProfile').classList.add('hidden'); document.getElementById('adminNavBtn').classList.add('hidden'); }
 
     loadProducts();
   </script>
