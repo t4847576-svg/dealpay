@@ -7,7 +7,8 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const ADMIN_USERNAME = 'Salxanich'; 
+// Администратор маркетплейса
+const ADMIN_USERNAME = 'revezzzzzz'; 
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -37,7 +38,6 @@ db.serialize(() => {
         order_code TEXT, product_title TEXT, price REAL, fee REAL, total REAL, buyer TEXT, seller TEXT, status TEXT DEFAULT 'pending', reviewed INTEGER DEFAULT 0
     )`);
 
-    // Таблиця профілів та балансів продавців (рейтинг та відгуки)
     db.run(`CREATE TABLE IF NOT EXISTS profiles (
         seller TEXT PRIMARY KEY,
         balance REAL DEFAULT 0.0,
@@ -65,7 +65,6 @@ const checkAdmin = (req, res, next) => {
     next();
 };
 
-// ТОВАРИ
 app.get('/api/products', (req, res) => {
     db.all("SELECT * FROM products ORDER BY id DESC", [], (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
@@ -88,7 +87,6 @@ app.delete('/api/admin/products/:id', checkAdmin, (req, res) => {
     db.run(`DELETE FROM products WHERE id = ?`, [req.params.id], (err) => res.json({ success: true }));
 });
 
-// УГОДИ ТА БАЛАНС / ПОПОВНЕННЯ
 app.get('/api/orders', (req, res) => {
     db.all("SELECT * FROM orders ORDER BY id DESC", [], (err, rows) => res.json(rows || []));
 });
@@ -103,13 +101,11 @@ app.post('/api/orders/create', (req, res) => {
     const { product_title, price, buyer, seller } = req.body;
     const fee = price * 0.03, total = price + fee;
 
-    // Перевіряємо баланс покупця
     db.get("SELECT balance FROM profiles WHERE seller = ?", [buyer], (err, profile) => {
         if (!profile || profile.balance < total) {
             return res.status(400).json({ error: "Недостатньо коштів на балансі! Поповніть гаманець." });
         }
 
-        // Спиסуємо кошти з баланс покупця
         db.run("UPDATE profiles SET balance = balance - ? WHERE seller = ?", [total, buyer], (err) => {
             const order_code = 'DEAL-' + Math.floor(100000 + Math.random() * 900000);
             db.run(`INSERT INTO orders (order_code, product_title, price, fee, total, buyer, seller) VALUES (?, ?, ?, ?, ?, ?, ?)`,
@@ -118,19 +114,16 @@ app.post('/api/orders/create', (req, res) => {
     });
 });
 
-// ЗАВЕРШЕННЯ УГОДИ ТА ВІДГУК / РЕЙТИНГ
 app.post('/api/orders/complete', (req, res) => {
     const { order_code, rating } = req.body;
     db.get("SELECT * FROM orders WHERE order_code = ? AND status = 'pending'", [order_code], (err, order) => {
         if (!order) return res.status(400).json({ error: "Заказ не знайдено" });
 
         db.run(`UPDATE orders SET status = 'completed', reviewed = 1 WHERE order_code = ?`, [order_code], () => {
-            // Нараховуємо гроші продавцю
             db.run(`INSERT INTO profiles (seller, balance, earned) VALUES (?, ?, ?) 
                     ON CONFLICT(seller) DO UPDATE SET balance = balance + ?, earned = earned + ?`,
                 [order.seller, order.price, order.price, order.price, order.price], () => {
                 
-                // Оновлюємо рейтинг продавця
                 db.get("SELECT rating, reviews_count FROM profiles WHERE seller = ?", [order.seller], (err, prof) => {
                     const currentRating = prof ? prof.rating : 0.0;
                     const count = prof ? prof.reviews_count : 0;
@@ -152,7 +145,6 @@ app.get('/api/profile/:seller', (req, res) => {
     });
 });
 
-// ПІДТРИМКА ТА СКАРГИ
 app.post('/api/support/ticket', (req, res) => {
     db.run(`INSERT INTO tickets (user, message) VALUES (?, ?)`, [req.body.user, req.body.message], () => res.json({ success: true }));
 });
