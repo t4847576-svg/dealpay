@@ -58,9 +58,13 @@
             </script>
           </div>
 
-          <div id="userProfile" class="hidden items-center space-x-2">
-            <span id="userName" class="text-xs font-bold text-brand-500">@user</span>
-            <button onclick="logout()" class="text-xs text-gray-400 hover:text-red-400 ml-2"><i class="fa-solid fa-right-from-bracket"></i></button>
+          <div id="userProfile" class="hidden items-center space-x-3">
+            <div class="text-right">
+              <span id="userName" class="text-xs font-bold text-brand-500 block">@user</span>
+              <span class="text-[10px] text-gray-400">Баланс: <strong id="userHeaderBalance" class="text-white">0.00 ₴</strong></span>
+            </div>
+            <button onclick="openTopUpModal()" class="bg-brand-500/10 hover:bg-brand-500 text-brand-500 hover:text-slate-950 text-xs px-2.5 py-1.5 rounded-lg border border-brand-500/30 transition" title="Поповнити баланс"><i class="fa-solid fa-wallet"></i></button>
+            <button onclick="logout()" class="text-xs text-gray-400 hover:text-red-400 ml-1"><i class="fa-solid fa-right-from-bracket"></i></button>
           </div>
 
           <button onclick="openCreateModal()" class="bg-brand-500 hover:bg-brand-600 text-slate-950 font-semibold px-4 py-2 rounded-lg text-sm transition shadow-lg shadow-emerald-500/20">
@@ -77,25 +81,32 @@
         <div class="relative rounded-2xl glass-card p-8 mb-8 border border-gray-800 glow-emerald overflow-hidden">
           <div class="absolute -top-24 -right-24 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl"></div>
           <div class="relative z-10 max-w-2xl">
-            <span class="bg-brand-500/10 text-brand-500 text-xs font-semibold px-3 py-1 rounded-full border border-brand-500/20 mb-3 inline-block">🛡️ Safe-Escrow Захист (Комісія 3%)</span>
+            <span class="bg-brand-500/10 text-brand-500 text-xs font-semibold px-3 py-1 rounded-full border border-brand-500/20 mb-3 inline-block">🛡️ Safe-Escrow Захист угод</span>
             <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-3">Український маркетплейс ігрових цінностей</h1>
-            <p class="text-gray-400 text-sm mb-6">Купуйте та продавайте аккаунти, вірти та скіни в CS2, GTA 5 RP, Minecraft та Telegram безпечно.</p>
-            <div class="flex gap-3">
-              <button onclick="filterCategory('')" class="bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs transition">Усі товари</button>
-              <button onclick="filterCategory('CS2')" class="bg-slate-900 hover:bg-slate-800 text-gray-200 font-semibold px-4 py-2.5 rounded-xl border border-gray-700 text-xs transition">CS2</button>
-              <button onclick="filterCategory('GTA 5 RP')" class="bg-slate-900 hover:bg-slate-800 text-gray-200 font-semibold px-4 py-2.5 rounded-xl border border-gray-700 text-xs transition">GTA 5 RP</button>
+            <p class="text-gray-400 text-sm mb-6">Купуйте та продавайте аккаунти, вірти та скіни в популярних іграх з миттєвим зарахуванням.</p>
+            
+            <!-- Кнопки швидких категорій -->
+            <div class="flex flex-wrap gap-2">
+              <button onclick="filterCategory('')" class="bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs transition">Усі ігри</button>
+              <button onclick="filterCategory('CS2')" class="bg-slate-900 hover:bg-slate-800 text-gray-200 px-3 py-2 rounded-xl border border-gray-700 text-xs transition">CS2</button>
+              <button onclick="filterCategory('GTA 5 RP')" class="bg-slate-900 hover:bg-slate-800 text-gray-200 px-3 py-2 rounded-xl border border-gray-700 text-xs transition">GTA 5 RP</button>
+              <button onclick="filterCategory('Minecraft')" class="bg-slate-900 hover:bg-slate-800 text-gray-200 px-3 py-2 rounded-xl border border-gray-700 text-xs transition">Minecraft</button>
+              <button onclick="filterCategory('Roblox')" class="bg-slate-900 hover:bg-slate-800 text-gray-200 px-3 py-2 rounded-xl border border-gray-700 text-xs transition">Roblox</button>
+              <button onclick="filterCategory('Brawl Stars')" class="bg-slate-900 hover:bg-slate-800 text-gray-200 px-3 py-2 rounded-xl border border-gray-700 text-xs transition">Brawl Stars</button>
+              <button onclick="filterCategory('Valorant')" class="bg-slate-900 hover:bg-slate-800 text-gray-200 px-3 py-2 rounded-xl border border-gray-700 text-xs transition">Valorant</button>
+              <button onclick="filterCategory('Telegram')" class="bg-slate-900 hover:bg-slate-800 text-gray-200 px-3 py-2 rounded-xl border border-gray-700 text-xs transition">Telegram</button>
             </div>
           </div>
         </div>
 
         <div class="flex justify-between items-center mb-6">
-          <h2 class="text-lg font-bold text-white">Актуальні оголошення</h2>
+          <h2 id="catalogTitle" class="text-lg font-bold text-white">Усі оголошення</h2>
           <span id="productCount" class="text-xs text-gray-400"></span>
         </div>
         <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
       </section>
 
-      <!-- ДЕТАЛЬНА СТОРІНКА ТОВАРУ -->
+      <!-- СТОРІНКА ТОВАРУ -->
       <section id="sec-product-detail" class="hidden">
         <button onclick="showSection('catalog')" class="text-xs text-brand-500 hover:underline mb-6 flex items-center"><i class="fa-solid fa-arrow-left mr-2"></i> Назад до каталогу</button>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -119,14 +130,15 @@
               
               <div class="border-t border-gray-800 pt-4 mb-6 text-xs text-gray-400 space-y-2">
                 <div class="flex justify-between"><span>Продавець:</span> <strong id="detailSeller" class="text-white"></strong></div>
+                <div class="flex justify-between"><span>Рейтинг продавця:</span> <strong id="detailSellerRating" class="text-amber-400">★ 0.0 (0)</strong></div>
                 <div class="flex justify-between"><span>Безпека:</span> <strong class="text-brand-500">Safe-Escrow</strong></div>
               </div>
 
               <button id="detailBuyBtn" class="w-full bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold py-3 rounded-xl text-xs transition shadow-lg shadow-emerald-500/20 mb-3">
-                Купити через Safe-Escrow
+                Купити з балансу
               </button>
               <button onclick="openReportModal('product', currentProductId)" class="w-full bg-slate-900 hover:bg-slate-800 text-red-400 border border-gray-800 py-2.5 rounded-xl text-xs transition">
-                <i class="fa-solid fa-flag mr-1"></i> Поскаржитися на товар
+                <i class="fa-solid fa-flag mr-1"></i> Поскаржитися
               </button>
             </div>
           </div>
@@ -149,9 +161,19 @@
       <!-- SELLER -->
       <section id="sec-seller" class="hidden">
         <h2 class="text-2xl font-bold text-white mb-6">Кабінет продавця</h2>
-        <div class="glass-card p-6 rounded-xl border border-gray-800 max-w-sm">
-          <span class="text-xs text-gray-400">Доступно до виводу</span>
-          <p id="sellerBalance" class="text-2xl font-extrabold text-white mt-1">0.00 ₴</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="glass-card p-6 rounded-xl border border-gray-800">
+            <span class="text-xs text-gray-400">Доступний баланс</span>
+            <p id="sellerBalance" class="text-2xl font-extrabold text-white mt-1">0.00 ₴</p>
+          </div>
+          <div class="glass-card p-6 rounded-xl border border-gray-800">
+            <span class="text-xs text-gray-400">Всього зароблено</span>
+            <p id="sellerEarned" class="text-2xl font-extrabold text-brand-500 mt-1">0.00 ₴</p>
+          </div>
+          <div class="glass-card p-6 rounded-xl border border-gray-800">
+            <span class="text-xs text-gray-400">Рейтинг та відгуки</span>
+            <p id="sellerStatsRating" class="text-2xl font-extrabold text-amber-400 mt-1">★ 0.0 <span class="text-xs text-gray-400 font-normal">(0 відгуків)</span></p>
+          </div>
         </div>
       </section>
 
@@ -171,21 +193,14 @@
         </div>
       </section>
 
-      <!-- ADMIN PANEL -->
+      <!-- ADMIN -->
       <section id="sec-admin" class="hidden">
         <div class="flex items-center space-x-3 mb-6">
           <h2 class="text-2xl font-bold text-amber-400"><i class="fa-solid fa-user-shield"></i> Панель Адміністратора</h2>
-          <span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs px-3 py-1 rounded-full font-semibold">@Salxanich</span>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div class="glass-card p-6 rounded-xl border border-gray-800">
-            <h3 class="font-bold text-white mb-4 text-sm">Підтримка</h3>
-            <div id="adminTicketsList" class="space-y-4 max-h-[450px] overflow-y-auto custom-scrollbar"></div>
-          </div>
-          <div class="glass-card p-6 rounded-xl border border-gray-800">
-            <h3 class="font-bold text-white mb-4 text-sm">Скарги</h3>
-            <div id="adminReportsList" class="space-y-4 max-h-[450px] overflow-y-auto custom-scrollbar"></div>
-          </div>
+          <div class="glass-card p-6 rounded-xl border border-gray-800"><h3 class="font-bold text-white mb-4 text-sm">Підтримка</h3><div id="adminTicketsList" class="space-y-4 max-h-[450px] overflow-y-auto"></div></div>
+          <div class="glass-card p-6 rounded-xl border border-gray-800"><h3 class="font-bold text-white mb-4 text-sm">Скарги</h3><div id="adminReportsList" class="space-y-4 max-h-[450px] overflow-y-auto"></div></div>
         </div>
       </section>
 
@@ -200,25 +215,46 @@
       <div class="space-y-3 text-xs mb-6">
         <input type="text" id="newTitle" placeholder="Назва товару" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-gray-200">
         <select id="newCategory" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-gray-200">
-          <option value="CS2">CS2</option><option value="GTA 5 RP">GTA 5 RP</option><option value="Minecraft">Minecraft</option><option value="Telegram">Telegram</option>
+          <option value="CS2">CS2</option>
+          <option value="GTA 5 RP">GTA 5 RP</option>
+          <option value="Minecraft">Minecraft</option>
+          <option value="Roblox">Roblox</option>
+          <option value="Brawl Stars">Brawl Stars</option>
+          <option value="Valorant">Valorant</option>
+          <option value="Telegram">Telegram</option>
         </select>
         <input type="number" id="newPrice" placeholder="Ціна (₴)" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-gray-200">
-        <textarea id="newDesc" rows="3" placeholder="Детальний опис товару..." class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-gray-200"></textarea>
+        <textarea id="newDesc" rows="3" placeholder="Опис..." class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-gray-200"></textarea>
         <input type="file" id="productPhotos" multiple accept="image/*" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2 text-gray-200">
       </div>
       <button onclick="addProductToDB()" class="w-full bg-brand-500 text-slate-950 font-bold py-3 rounded-xl text-xs">Опублікувати</button>
     </div>
   </div>
 
-  <!-- MODAL REPORT -->
-  <div id="modal-report" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-    <div class="glass-card max-w-md w-full p-6 rounded-2xl border border-gray-800 relative">
-      <button onclick="closeReportModal()" class="absolute top-4 right-4 text-gray-400"><i class="fa-solid fa-xmark"></i></button>
-      <h3 class="text-lg font-bold text-white mb-4">Поскаржитися</h3>
-      <input type="hidden" id="reportTargetId">
-      <input type="hidden" id="reportTargetType">
-      <textarea id="reportReason" rows="3" placeholder="Причина скарги..." class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-xs text-gray-200 mb-4"></textarea>
-      <button onclick="submitReport()" class="w-full bg-red-500 text-white font-bold py-2.5 rounded-xl text-xs">Надіслати</button>
+  <!-- MODAL TOPUP (Поповнення балансу) -->
+  <div id="modal-topup" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="glass-card max-w-sm w-full p-6 rounded-2xl border border-gray-800 relative">
+      <button onclick="closeTopUpModal()" class="absolute top-4 right-4 text-gray-400"><i class="fa-solid fa-xmark"></i></button>
+      <h3 class="text-lg font-bold text-white mb-4">Поповнення гаманця</h3>
+      <input type="number" id="topupAmount" placeholder="Сума (₴)" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-xs text-gray-200 mb-4">
+      <button onclick="topUpBalance()" class="w-full bg-brand-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs">Поповнити через Mono/Privat</button>
+    </div>
+  </div>
+
+  <!-- MODAL REVIEW (Відгук та рейтинг після покупки) -->
+  <div id="modal-review" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="glass-card max-w-sm w-full p-6 rounded-2xl border border-gray-800 relative text-center">
+      <h3 class="text-lg font-bold text-white mb-2">Оцініть угоду</h3>
+      <p class="text-xs text-gray-400 mb-4">Поставте оцінку продавцю від 1 до 5 зірок</p>
+      <input type="hidden" id="reviewOrderCode">
+      <div class="flex justify-center space-x-3 text-2xl text-amber-400 mb-6 cursor-pointer">
+        <i class="fa-solid fa-star" onclick="setRating(1)" id="star-1"></i>
+        <i class="fa-solid fa-star" onclick="setRating(2)" id="star-2"></i>
+        <i class="fa-solid fa-star" onclick="setRating(3)" id="star-3"></i>
+        <i class="fa-solid fa-star" onclick="setRating(4)" id="star-4"></i>
+        <i class="fa-solid fa-star" onclick="setRating(5)" id="star-5"></i>
+      </div>
+      <button onclick="submitReview()" class="w-full bg-brand-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs">Підтвердити та закрити угоду</button>
     </div>
   </div>
 
@@ -226,6 +262,8 @@
     let currentUser = null;
     let allProducts = [];
     let currentProductId = null;
+    let selectedRating = 5;
+    let activeCategory = '';
     const ADMIN_USER = '@Salxanich';
 
     function onTelegramAuth(user) {
@@ -237,21 +275,32 @@
       if (currentUser.toLowerCase() === ADMIN_USER.toLowerCase()) {
         document.getElementById('adminNavBtn').classList.remove('hidden');
       }
+      loadUserData();
       loadProducts();
+    }
+
+    async function loadUserData() {
+      if (!currentUser) return;
+      const res = await fetch(`/api/profile/${encodeURIComponent(currentUser)}`);
+      const data = await res.json();
+      document.getElementById('userHeaderBalance').innerText = data.balance.toFixed(2) + ' ₴';
+      document.getElementById('sellerBalance').innerText = data.balance.toFixed(2) + ' ₴';
+      document.getElementById('sellerEarned').innerText = data.earned.toFixed(2) + ' ₴';
+      document.getElementById('sellerStatsRating').innerHTML = `★ ${data.rating} <span class="text-xs text-gray-400 font-normal">(${data.reviews_count} відгуків)</span>`;
     }
 
     async function loadProducts() {
       const res = await fetch('/api/products');
       allProducts = await res.json();
-      renderProducts(allProducts);
+      renderProducts(activeCategory ? allProducts.filter(p => p.category === activeCategory) : allProducts);
     }
 
     function renderProducts(items) {
       const grid = document.getElementById('productsGrid');
       grid.innerHTML = '';
       if (items.length === 0) {
-        grid.innerHTML = '<p class="text-gray-500 text-xs">Немає товарів.</p>';
-        document.getElementById('productCount.innerText') = '';
+        grid.innerHTML = '<p class="text-gray-500 text-xs">У цій категорії поки немає товарів.</p>';
+        document.getElementById('productCount').innerText = 'Лотів: 0';
         return;
       }
       items.forEach(p => {
@@ -263,7 +312,7 @@
             <div class="cursor-pointer" onclick="openProductDetail(${p.id})">
               <div class="h-44 bg-slate-900 relative overflow-hidden">
                 <img src="${mainImg}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                <span class="absolute top-2 left-2 bg-slate-950/80 text-brand-400 text-[10px] px-2.5 py-1 rounded-full border border-brand-500/20">${p.category}</span>
+                <span class="absolute top-2 left-2 bg-slate-950/85 text-brand-400 text-[10px] px-2.5 py-1 rounded-full border border-brand-500/20">${p.category}</span>
               </div>
               <div class="p-4">
                 <h3 class="font-semibold text-white text-sm mb-1 group-hover:text-brand-500 transition">${p.title}</h3>
@@ -283,8 +332,13 @@
       document.getElementById('productCount').innerText = `Лотів: ${items.length}`;
     }
 
-    // ВІДКРИТТЯ СТОРІНКИ ТОВАРУ
-    function openProductDetail(id) {
+    function filterCategory(cat) {
+      activeCategory = cat;
+      document.getElementById('catalogTitle').innerText = cat ? `Категорія: ${cat}` : 'Усі оголошення';
+      renderProducts(cat ? allProducts.filter(p => p.category === cat) : allProducts);
+    }
+
+    async function openProductDetail(id) {
       const p = allProducts.find(item => item.id === id);
       if (!p) return;
       currentProductId = p.id;
@@ -294,6 +348,11 @@
       document.getElementById('detailPrice').innerText = p.price + ' ₴';
       document.getElementById('detailDesc').innerText = p.desc || 'Опис відсутній.';
       document.getElementById('detailSeller').innerText = p.seller;
+
+      // Отримуємо рейтинг продавця для сторінки товару
+      const res = await fetch(`/api/profile/${encodeURIComponent(p.seller)}`);
+      const prof = await res.json();
+      document.getElementById('detailSellerRating').innerText = `★ ${prof.rating} (${prof.reviews_count})`;
 
       const mainImg = document.getElementById('detailMainImg');
       const thumbContainer = document.getElementById('detailThumbnails');
@@ -313,43 +372,79 @@
     }
 
     async function createOrder(title, price, seller) {
-      if (!currentUser) return alert('Увійдіть через Telegram для покупки!');
-      await fetch('/api/orders/create', {
+      if (!currentUser) return alert('Увійдіть через Telegram!');
+      const res = await fetch('/api/orders/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ product_title: title, price, buyer: currentUser, seller })
       });
+      const data = await res.json();
+      if (!res.ok) return alert(data.error || 'Помилка');
+      loadUserData();
       showSection('buyer');
       loadOrders();
-      alert('Успішно! Кошти зарезервовано в Safe-Escrow.');
+      alert('Успішно! Кошти заморожено в Escrow.');
     }
 
     async function loadOrders() {
       const res = await fetch('/api/orders');
       const orders = await res.json();
       const tbody = document.getElementById('buyerOrdersList');
-      tbody.innerHTML = orders.map(o => `
+      tbody.innerHTML = orders.filter(o => o.buyer === currentUser).map(o => `
         <tr>
           <td class="p-3 font-mono">${o.order_code}</td>
           <td class="p-3 text-white">${o.product_title}</td>
           <td class="p-3">${o.seller}</td>
           <td class="p-3 font-bold text-white">${o.total.toFixed(2)} ₴</td>
-          <td class="p-3"><span class="${o.status === 'completed' ? 'text-emerald-400 bg-emerald-500/10' : 'text-amber-400 bg-amber-500/10'} px-2 py-0.5 rounded text-[10px] border">${o.status === 'completed' ? 'Виплачено' : 'В Escrow'}</span></td>
+          <td class="p-3"><span class="${o.status === 'completed' ? 'text-emerald-400 bg-emerald-500/10' : 'text-amber-400 bg-amber-500/10'} px-2 py-0.5 rounded text-[10px] border">${o.status === 'completed' ? 'Завершено' : 'В Escrow'}</span></td>
           <td class="p-3 text-right">
-            ${o.status !== 'completed' ? `<button onclick="completeOrder('${o.order_code}')" class="bg-brand-500 text-slate-950 px-2.5 py-1 rounded font-semibold text-xs">Отримав</button>` : 'Закрито'}
+            ${o.status !== 'completed' ? `<button onclick="openReviewModal('${o.order_code}')" class="bg-brand-500 text-slate-950 px-2.5 py-1 rounded font-semibold text-xs">Отримав товар</button>` : 'Закрито'}
           </td>
         </tr>
       `).join('');
     }
 
-    async function completeOrder(code) {
+    // ВІДГУКИ ТА ОЦІНКИ
+    function openReviewModal(orderCode) {
+      document.getElementById('reviewOrderCode').value = orderCode;
+      setRating(5);
+      document.getElementById('modal-review').classList.remove('hidden');
+      document.getElementById('modal-review').classList.add('flex');
+    }
+    function setRating(r) {
+      selectedRating = r;
+      for (let i = 1; i <= 5; i++) {
+        const star = document.getElementById(`star-${i}`);
+        star.className = i <= r ? "fa-solid fa-star text-amber-400" : "fa-regular fa-star text-gray-600";
+      }
+    }
+    async function submitReview() {
+      const order_code = document.getElementById('reviewOrderCode').value;
       await fetch('/api/orders/complete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ order_code: code })
+        body: JSON.stringify({ order_code, rating: selectedRating })
       });
+      document.getElementById('modal-review').classList.add('hidden');
       loadOrders();
-      alert('Угоду закрито!');
+      loadUserData();
+      alert('Дякуємо! Угоду закрито, рейтинг продавця оновлено.');
+    }
+
+    // ПОПОВНЕННЯ БАЛАНСУ
+    function openTopUpModal() { document.getElementById('modal-topup').classList.remove('hidden'); document.getElementById('modal-topup').classList.add('flex'); }
+    function closeTopUpModal() { document.getElementById('modal-topup').classList.add('hidden'); }
+    async function topUpBalance() {
+      const amount = Number(document.getElementById('topupAmount').value);
+      if (!amount || amount <= 0) return alert('Введіть суму!');
+      await fetch('/api/balance/topup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ seller: currentUser, amount })
+      });
+      closeTopUpModal();
+      loadUserData();
+      alert(`Баланс успішно поповнено на ${amount} ₴!`);
     }
 
     async function addProductToDB() {
@@ -368,35 +463,15 @@
       loadProducts();
     }
 
-    function filterCategory(cat) {
-      showSection('catalog');
-      if (!cat) return renderProducts(allProducts);
-      renderProducts(allProducts.filter(p => p.category === cat));
-    }
-
-    // СКАРГИ ТА ПІДТРИМКА
     function openReportModal(type, id) {
       if (!currentUser) return alert('Увійдіть через Telegram!');
-      document.getElementById('reportTargetType').value = type;
-      document.getElementById('reportTargetId').value = id;
-      document.getElementById('modal-report').classList.remove('hidden');
-      document.getElementById('modal-report').classList.add('flex');
-    }
-    function closeReportModal() { document.getElementById('modal-report').classList.add('hidden'); }
-
-    async function submitReport() {
-      await fetch('/api/reports', {
+      const reason = prompt('Вкажіть причину скарги:');
+      if (!reason) return;
+      fetch('/api/reports', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          reporter: currentUser,
-          target_type: document.getElementById('reportTargetType').value,
-          target_id: document.getElementById('reportTargetId').value,
-          reason: document.getElementById('reportReason').value
-        })
-      });
-      closeReportModal();
-      alert('Скаргу надіслано адміністратору!');
+        body: JSON.stringify({ reporter: currentUser, target_type: type, target_id: id, reason })
+      }).then(() => alert('Скаргу надіслано!'));
     }
 
     async function sendTicket() {
@@ -425,7 +500,6 @@
       `).join('');
     }
 
-    // АДМІНКА
     async function deleteProductByAdmin(id) {
       if (!confirm('Видалити товар?')) return;
       await fetch(`/api/admin/products/${id}`, { method: 'DELETE', headers: { 'x-user-name': currentUser } });
@@ -477,6 +551,7 @@
       document.getElementById('sec-' + id).classList.remove('hidden');
       if (id === 'catalog') loadProducts();
       if (id === 'buyer') loadOrders();
+      if (id === 'seller') loadUserData();
       if (id === 'support') loadMyTickets();
       if (id === 'admin') { loadAdminTickets(); loadAdminReports(); }
       window.scrollTo({ top: 0, behavior: 'smooth' });
