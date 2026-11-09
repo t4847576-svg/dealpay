@@ -6,26 +6,30 @@ const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const ADMIN_USERNAME = 'revezzzzzz';
 
-// Администратор маркетплейса
-const ADMIN_USERNAME = 'revezzzzzz'; 
+const DATA_DIR = fs.existsSync('/data') ? '/data' : '.';
+const DB_PATH = path.join(DATA_DIR, 'dealpay.db');
+const UPLOADS_DIR = path.join(DATA_DIR, 'uploads');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname)));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(UPLOADS_DIR));
 
-if (!fs.existsSync('./uploads')) {
-    fs.mkdirSync('./uploads');
+if (!fs.existsSync(UPLOADS_DIR)) {
+    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 }
 
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, 'uploads/'),
+    destination: (req, file, cb) => cb(null, UPLOADS_DIR),
     filename: (req, file, cb) => cb(null, Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname))
 });
 const upload = multer({ storage: storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
-const db = new sqlite3.Database('./dealpay.db');
+const db = new sqlite3.Database(DB_PATH, (err) => {
+    if (err) console.error('Помилка БД:', err.message);
+});
 
 db.serialize(() => {
     db.run(`CREATE TABLE IF NOT EXISTS products (
@@ -55,6 +59,12 @@ db.serialize(() => {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         reporter TEXT, target_type TEXT, target_id TEXT, reason TEXT, status TEXT DEFAULT 'pending', created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`);
+
+    // Заявки на поповнення балансу (P2P)
+    db.run(`CREATE TABLE IF NOT EXISTS topups (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user TEXT, amount REAL, receipt_info TEXT, status TEXT DEFAULT 'pending', created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`);
 });
 
 const checkAdmin = (req, res, next) => {
@@ -65,6 +75,7 @@ const checkAdmin = (req, res, next) => {
     next();
 };
 
+// ТОВАРИ
 app.get('/api/products', (req, res) => {
     db.all("SELECT * FROM products ORDER BY id DESC", [], (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
@@ -84,32 +95,61 @@ app.post('/api/products', upload.array('photos', 10), (req, res) => {
 });
 
 app.delete('/api/admin/products/:id', checkAdmin, (req, res) => {
-    db.run(`DELETE FROM products WHERE id = ?`, [req.params.id], (err) => res.json({ success: true }));
+    db.run(`DELETE FROM products WHERE id = ?`, [req.params.id], () => res.json({ success: true }));
 });
 
+// P2P ПОПОВНЕННЯ БАЛАНСУ
+app.post('/api/balance/topup-request', (req, res) => {
+    const { user, amount, receipt_info } = req.body;
+    if (!amount || amount <= 0) return res.status(400).json({ error: "Введіть коректну суму" });
+    db.run(`INSERT INTO topups (user, amount, receipt_info) VALUES (?, ?, ?)`,
+        [user, amount, receipt_info], function(err) {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ success: true, id: this.lastID });
+        });
+});
+
+app.get('/api/admin/topups', checkAdmin, (req, res) => {
+    db.all("SELECT * FROM topups WHERE status = 'pending' ORDER BY id DESC", [], (err, rows) => res.json(rows || []));
+});
+
+app.post('/api/admin/topups/approve', checkAdmin, (req, res) => {
+    const { id } = req.body;
+    db.get("SELECT * FROM topups WHERE id = ?", [id], (err, topup) => {
+        if (!topup || topup.status !== 'pending') return res.status(400).json({ error: "Заявку не знайдено" });
+        db.run(`UPDATE topups SET status = 'approved' WHERE id = ?`, [id], () => {
+            db.run(`INSERT INTO profiles (seller, balance) VALUES (?, ?) ON CONFLICT(seller) DO UPDATE SET balance = balance + ?`,
+                [topup.user, topup.amount, topup.amount], () => res.json({ success: true }));
+        });
+    });
+});
+
+// УГОДИ ТА КОМІСІЯ 3%
 app.get('/api/orders', (req, res) => {
     db.all("SELECT * FROM orders ORDER BY id DESC", [], (err, rows) => res.json(rows || []));
 });
 
-app.post('/api/balance/topup', (req, res) => {
-    const { seller, amount } = req.body;
-    db.run(`INSERT INTO profiles (seller, balance) VALUES (?, ?) ON CONFLICT(seller) DO UPDATE SET balance = balance + ?`,
-        [seller, amount, amount], (err) => res.json({ success: true }));
-});
-
 app.post('/api/orders/create', (req, res) => {
     const { product_title, price, buyer, seller } = req.body;
-    const fee = price * 0.03, total = price + fee;
+    const fee = price * 0.03;
+    const total = price + fee;
 
     db.get("SELECT balance FROM profiles WHERE seller = ?", [buyer], (err, profile) => {
         if (!profile || profile.balance < total) {
             return res.status(400).json({ error: "Недостатньо коштів на балансі! Поповніть гаманець." });
         }
 
-        db.run("UPDATE profiles SET balance = balance - ? WHERE seller = ?", [total, buyer], (err) => {
+        db.run("UPDATE profiles SET balance = balance - ? WHERE seller = ?", [total, buyer], () => {
             const order_code = 'DEAL-' + Math.floor(100000 + Math.random() * 900000);
             db.run(`INSERT INTO orders (order_code, product_title, price, fee, total, buyer, seller) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-                [order_code, product_title, price, fee, total, buyer, seller], () => res.json({ order_code, success: true }));
+                [order_code, product_title, price, fee, total, buyer, seller], () => {
+                    
+                    // Зараховуємо комісію 3% адміну
+                    db.run(`INSERT INTO profiles (seller, balance, earned) VALUES (?, ?, ?) ON CONFLICT(seller) DO UPDATE SET balance = balance + ?, earned = earned + ?`,
+                        [ADMIN_USERNAME, fee, fee, fee, fee]);
+
+                    res.json({ order_code, success: true });
+                });
         });
     });
 });
@@ -117,11 +157,10 @@ app.post('/api/orders/create', (req, res) => {
 app.post('/api/orders/complete', (req, res) => {
     const { order_code, rating } = req.body;
     db.get("SELECT * FROM orders WHERE order_code = ? AND status = 'pending'", [order_code], (err, order) => {
-        if (!order) return res.status(400).json({ error: "Заказ не знайдено" });
+        if (!order) return res.status(400).json({ error: "Замовлення не знайдено" });
 
         db.run(`UPDATE orders SET status = 'completed', reviewed = 1 WHERE order_code = ?`, [order_code], () => {
-            db.run(`INSERT INTO profiles (seller, balance, earned) VALUES (?, ?, ?) 
-                    ON CONFLICT(seller) DO UPDATE SET balance = balance + ?, earned = earned + ?`,
+            db.run(`INSERT INTO profiles (seller, balance, earned) VALUES (?, ?, ?) ON CONFLICT(seller) DO UPDATE SET balance = balance + ?, earned = earned + ?`,
                 [order.seller, order.price, order.price, order.price, order.price], () => {
                 
                 db.get("SELECT rating, reviews_count FROM profiles WHERE seller = ?", [order.seller], (err, prof) => {
@@ -145,6 +184,7 @@ app.get('/api/profile/:seller', (req, res) => {
     });
 });
 
+// ПІДТРИМКА ТА СКАРГИ
 app.post('/api/support/ticket', (req, res) => {
     db.run(`INSERT INTO tickets (user, message) VALUES (?, ?)`, [req.body.user, req.body.message], () => res.json({ success: true }));
 });
