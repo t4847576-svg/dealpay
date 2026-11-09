@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="uk" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DealPay — Український Цифровий Маркетплейс</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              accent: '#06b6d4',
+              bg: '#0a0e17',
+              card: '#141b2d',
+              border: '#1f293d'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body { background-color: #0a0e17; color: #f3f4f6; font-family: system-ui, -apple-system, sans-serif; }
+    .glass-card { background: rgba(20, 27, 45, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    .glow-emerald { box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.25); }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #0a0e17; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #1f293d; border-radius: 4px; }
+  </style>
+</head>
+<body class="custom-scrollbar">
+
+  <!-- Navigation -->
+  <header class="sticky top-0 z-50 glass-card border-b border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-8">
+        <a href="#" onclick="showSection('home')" class="flex items-center space-x-3 cursor-pointer">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-500 to-brand-accent flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-emerald-500/20">
+            D
+          </div>
+          <span class="text-xl font-bold tracking-tight text-white">Deal<span class="text-brand-500">Pay</span></span>
+        </a>
+        <nav class="hidden md:flex space-x-6 text-sm font-medium text-gray-300">
+          <button onclick="showSection('catalog')" class="hover:text-brand-500 transition">Каталог</button>
+          <button onclick="showSection('buyer')" class="hover:text-brand-500 transition">Мої покупки</button>
+          <button onclick="showSection('seller')" class="hover:text-brand-500 transition">Кабінет продавця</button>
+          <button onclick="showSection('admin')" class="hover:text-brand-500 transition">Адмінка</button>
+        </nav>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <div class="relative hidden sm:block w-56">
+          <input type="text" id="searchInput" oninput="filterProducts()" placeholder="Пошук послуг, ігор..." class="w-full bg-slate-900/90 border border-gray-800 rounded-lg py-2 pl-9 pr-4 text-xs text-gray-200 focus:outline-none focus:border-brand-500 transition">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-500 text-xs"></i>
+        </div>
+
+        <div id="authButtons" class="flex items-center space-x-2">
+          <button onclick="openAuthModal('login')" class="text-xs font-semibold text-gray-300 hover:text-white px-3 py-2 transition">Вхід</button>
+          <button onclick="openAuthModal('register')" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold px-3 py-1.5 rounded-lg text-xs border border-gray-700 transition">Реєстрація</button>
+        </div>
+
+        <div id="userProfile" class="hidden items-center space-x-2">
+          <span id="userName" class="text-xs font-bold text-brand-500">@user</span>
+          <button onclick="logout()" class="text-xs text-gray-400 hover:text-red-400"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+
+        <button onclick="showSection('seller')" class="bg-brand-500 hover:bg-brand-600 text-slate-950 font-semibold px-4 py-2 rounded-lg text-sm transition shadow-lg shadow-emerald-500/20">
+          <i class="fa-solid fa-plus mr-1"></i> Продати
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- HOME SECTION -->
+    <section id="sec-home">
+      <div class="relative rounded-2xl glass-card p-8 md:p-12 mb-10 overflow-hidden border border-gray-800/80 glow-emerald">
+        <div class="absolute -top-24 -right-24 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl"></div>
+        <div class="relative z-10 max-w-2xl">
+          <span class="bg-brand-500/10 text-brand-500 text-xs font-semibold px-3 py-1 rounded-full border border-brand-500/20 mb-4 inline-block">
+            🛡️ Безпечні угоди Safe-Escrow
+          </span>
+          <h1 class="text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4">
+            Головний український цифровий маркетплейс
+          </h1>
+          <p class="text-gray-400 text-base mb-6">
+            Купуйте та продавайте ігрові послуги, Telegram-ботів, дизайн та розробку з миттєвою гарантією збереження коштів у гривнях (₴).
+          </p>
+          <div class="flex flex-wrap gap-4">
+            <button onclick="showSection('catalog')" class="bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold px-6 py-3 rounded-xl transition shadow-lg shadow-emerald-500/20">
+              Перейти до каталогу
+            </button>
+            <button onclick="showSection('seller')" class="bg-slate-900 hover:bg-slate-800 text-gray-200 font-semibold px-6 py-3 rounded-xl border border-gray-700 transition">
+              Почати продавати
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="text-xl font-bold text-white mb-6">Популярні категорії</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-12">
+        <div onclick="showSection('catalog')" class="glass-card p-4 rounded-xl hover:border-brand-500/50 cursor-pointer transition text-center group">
+          <i class="fa-solid fa-gamepad text-2xl text-brand-500 mb-2 group-hover:scale-110 transition-transform"></i>
+          <p class="text-sm font-medium text-gray-200">CS2 & Буст</p>
+          <span class="text-xs text-gray-500">1,240 лотів</span>
+        </div>
+        <div onclick="showSection('catalog')" class="glass-card p-4 rounded-xl hover:border-brand-500/50 cursor-pointer transition text-center group">
+          <i class="fa-brands fa-telegram text-2xl text-brand-accent mb-2 group-hover:scale-110 transition-transform"></i>
+          <p class="text-sm font-medium text-gray-200">Telegram Боти</p>
+          <span class="text-xs text-gray-500">580 лотів</span>
+        </div>
+        <div onclick="showSection('catalog')" class="glass-card p-4 rounded-xl hover:border-brand-500/50 cursor-pointer transition text-center group">
+          <i class="fa-solid fa-cubes text-2xl text-emerald-400 mb-2 group-hover:scale-110 transition-transform"></i>
+          <p class="text-sm font-medium text-gray-200">Minecraft</p>
+          <span class="text-xs text-gray-500">890 лотів</span>
+        </div>
+        <div onclick="showSection('catalog')" class="glass-card p-4 rounded-xl hover:border-brand-500/50 cursor-pointer transition text-center group">
+          <i class="fa-solid fa-palette text-2xl text-purple-400 mb-2 group-hover:scale-110 transition-transform"></i>
+          <p class="text-sm font-medium text-gray-200">Дизайн & Превью</p>
+          <span class="text-xs text-gray-500">410 лотів</span>
+        </div>
+        <div onclick="showSection('catalog')" class="glass-card p-4 rounded-xl hover:border-brand-500/50 cursor-pointer transition text-center group">
+          <i class="fa-solid fa-code text-2xl text-amber-400 mb-2 group-hover:scale-110 transition-transform"></i>
+          <p class="text-sm font-medium text-gray-200">Веб-розробка</p>
+          <span class="text-xs text-gray-500">320 лотів</span>
+        </div>
+        <div onclick="showSection('catalog')" class="glass-card p-4 rounded-xl hover:border-brand-500/50 cursor-pointer transition text-center group">
+          <i class="fa-solid fa-crosshairs text-2xl text-red-400 mb-2 group-hover:scale-110 transition-transform"></i>
+          <p class="text-sm font-medium text-gray-200">PUBG Mobile</p>
+          <span class="text-xs text-gray-500">650 лотів</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- CATALOG SECTION -->
+    <section id="sec-catalog" class="hidden">
+      <div class="flex flex-col md:flex-row gap-8">
+        <aside class="w-full md:w-64 space-y-6 shrink-0">
+          <div class="glass-card p-5 rounded-xl border border-gray-800">
+            <h3 class="font-bold text-white mb-4 text-sm flex items-center justify-between">
+              Фільтри <i class="fa-solid fa-sliders text-brand-500"></i>
+            </h3>
+            <div class="space-y-4 text-xs">
+              <div>
+                <label class="block text-gray-400 mb-2">Категорія</label>
+                <select class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2 text-gray-200">
+                  <option>Усі категорії</option>
+                  <option>Ігрові послуги</option>
+                  <option>Telegram боти</option>
+                  <option>Дизайн</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <div class="flex-1">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-white">Усі пропозиції</h2>
+            <span class="text-xs text-gray-400" id="productCount">Активних лотів: 3</span>
+          </div>
+
+          <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BUYER DASHBOARD -->
+    <section id="sec-buyer" class="hidden">
+      <h2 class="text-2xl font-bold text-white mb-6">Кабінет покупця (Safe-Escrow)</h2>
+      <div class="glass-card rounded-xl p-6 border border-gray-800 mb-8">
+        <h3 class="text-lg font-semibold text-white mb-4">Мої активні замовлення</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-gray-300">
+            <thead class="bg-slate-900/80 uppercase text-gray-400 text-[10px]">
+              <tr>
+                <th class="p-3">ID Угоди</th>
+                <th class="p-3">Послуга</th>
+                <th class="p-3">Продавець</th>
+                <th class="p-3">Сума</th>
+                <th class="p-3">Статус</th>
+                <th class="p-3 text-right">Дія</th>
+              </tr>
+            </thead>
+            <tbody id="buyerOrdersList" class="divide-y divide-gray-800">
+              <tr>
+                <td class="p-3 font-mono">#ORD-9482</td>
+                <td class="p-3 font-medium text-white">Буст ELO FACEIT (+100 elo)</td>
+                <td class="p-3">@pro_booster</td>
+                <td class="p-3">367.50 ₴</td>
+                <td class="p-3"><span id="orderStatusBadge" class="bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded text-[10px] border border-amber-500/20">В роботі (Кошти в Escrow)</span></td>
+                <td class="p-3 text-right">
+                  <button onclick="completeOrder()" class="bg-brand-500 hover:bg-brand-600 text-slate-950 px-2.5 py-1 rounded font-semibold transition">Підтвердити</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SELLER DASHBOARD -->
+    <section id="sec-seller" class="hidden">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-white">Панель продавця</h2>
+        <button onclick="openCreateModal()" class="bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm transition shadow-lg shadow-emerald-500/20">
+          + Створити послугу
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="glass-card p-5 rounded-xl border border-gray-800">
+          <span class="text-xs text-gray-400">Баланс доступний до виводу (Mono/Privat)</span>
+          <p class="text-2xl font-extrabold text-white mt-1">4 850 ₴</p>
+        </div>
+        <div class="glass-card p-5 rounded-xl border border-gray-800">
+          <span class="text-xs text-gray-400">Зароблено за весь час</span>
+          <p class="text-2xl font-extrabold text-brand-500 mt-1">12 400 ₴</p>
+        </div>
+        <div class="glass-card p-5 rounded-xl border border-gray-800">
+          <span class="text-xs text-gray-400">Рейтинг продавця</span>
+          <p class="text-2xl font-extrabold text-amber-400 mt-1">4.98 ★</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADMIN PANEL -->
+    <section id="sec-admin" class="hidden">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-white">Панель адміністратора</h2>
+        <div class="bg-brand-500/10 border border-brand-500/30 text-brand-500 px-4 py-2 rounded-xl text-xs font-bold">
+          Дохід маркетплейсу (Комісія 5%): <span class="text-white">1 420 ₴</span>
+        </div>
+      </div>
+
+      <div class="glass-card p-6 rounded-xl border border-red-500/20 mb-6">
+        <h3 class="text-md font-bold text-red-400 mb-3"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Відкриті арбітражі (0)</h3>
+        <p class="text-xs text-gray-400">Усі угоди проходять у штатному режимі через Safe-Escrow.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL AUTH -->
+  <div id="modal-auth" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="glass-card max-w-sm w-full p-6 rounded-2xl border border-gray-800 relative shadow-2xl">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <h3 id="authTitle" class="text-lg font-bold text-white mb-4">Вхід у DealPay</h3>
+      
+      <div class="space-y-4 text-xs mb-6">
+        <div>
+          <label class="block text-gray-400 mb-1">Нікнейм або Email</label>
+          <input type="text" id="authEmail" placeholder="your_name" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-gray-200">
+        </div>
+        <div>
+          <label class="block text-gray-400 mb-1">Пароль</label>
+          <input type="password" id="authPass" placeholder="••••••••" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-gray-200">
+        </div>
+      </div>
+
+      <button onclick="submitAuth()" class="w-full bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold py-3 rounded-xl transition text-sm shadow-lg shadow-emerald-500/20">
+        Продовжити
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL PAYMENT SIMULATOR -->
+  <div id="modal-pay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="glass-card max-w-md w-full p-6 rounded-2xl border border-gray-800 relative shadow-2xl">
+      <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <div class="text-center mb-6">
+        <div class="w-12 h-12 bg-brand-500/10 text-brand-500 rounded-full flex items-center justify-center mx-auto mb-3 border border-brand-500/20">
+          <i class="fa-solid fa-shield-halved text-xl"></i>
+        </div>
+        <h3 class="text-lg font-bold text-white">Оформлення безпечної угоди</h3>
+        <p class="text-xs text-gray-400 mt-1">Кошти заморожуються системою Safe-Escrow</p>
+      </div>
+
+      <div class="space-y-3 text-xs bg-slate-900/90 p-4 rounded-xl border border-gray-800 mb-6">
+        <div class="flex justify-between text-gray-300">
+          <span>Послуга:</span>
+          <span id="payModalTitle" class="font-semibold text-white">Буст ELO FACEIT</span>
+        </div>
+        <div class="flex justify-between text-gray-300">
+          <span>Ціна продавця:</span>
+          <span id="payModalBasePrice" class="font-semibold text-white">350 ₴</span>
+        </div>
+        <div class="flex justify-between text-gray-300">
+          <span>Комісія маркетплейсу (5%):</span>
+          <span id="payModalFee" class="font-semibold text-brand-500">17.50 ₴</span>
+        </div>
+        <div class="border-t border-gray-800 pt-2 flex justify-between text-sm font-bold text-white">
+          <span>Разом до сплати:</span>
+          <span id="payModalTotal" class="text-brand-500">367.50 ₴</span>
+        </div>
+      </div>
+
+      <button onclick="simulatePayment()" class="w-full bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold py-3 rounded-xl transition text-sm shadow-lg shadow-emerald-500/20">
+        Сплатити через Monobank / PrivatBank
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL CREATE PRODUCT -->
+  <div id="modal-create" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="glass-card max-w-md w-full p-6 rounded-2xl border border-gray-800 relative shadow-2xl">
+      <button onclick="closeCreateModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <h3 class="text-lg font-bold text-white mb-4">Створити нову послугу</h3>
+      
+      <div class="space-y-4 text-xs mb-6">
+        <div>
+          <label class="block text-gray-400 mb-1">Назва послуги</label>
+          <input type="text" id="newTitle" placeholder="Наприклад: Буст ранку в CS2" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2 text-gray-200">
+        </div>
+        <div>
+          <label class="block text-gray-400 mb-1">Категорія</label>
+          <select id="newCategory" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2 text-gray-200">
+            <option>CS2 Services</option>
+            <option>Telegram</option>
+            <option>Design</option>
+            <option>Minecraft</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-gray-400 mb-1">Ціна (₴)</label>
+          <input type="number" id="newPrice" placeholder="500" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2 text-gray-200">
+        </div>
+        <div>
+          <label class="block text-gray-400 mb-1">Опис</label>
+          <textarea id="newDesc" rows="3" placeholder="Опишіть деталі виконання послуги..." class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2 text-gray-200"></textarea>
+        </div>
+      </div>
+
+      <button onclick="addProduct()" class="w-full bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold py-3 rounded-xl transition text-sm shadow-lg shadow-emerald-500/20">
+        Опублікувати лот
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let currentUser = null;
+
+    let products = [
+      { id: 1, title: "Швидкий буст ELO FACEIT від гравця Level 10", category: "CS2 Services", price: 350, rating: "4.9 (128)", desc: "Чиста гра без софту, дуо або з передачею акаунту. Гарантія термінів.", tagColor: "emerald" },
+      { id: 2, title: "Розробка Telegram-бота автопродажів на Python", category: "Telegram", price: 1500, rating: "5.0 (42)", desc: "Підключення LiqPay/CryptoBot, адмін-панель, база даних SQLite/PostgreSQL.", tagColor: "cyan" },
+      { id: 3, title: "Клікабельне прев'ю для YouTube / TikTok препак (3 шт)", category: "Design", price: 600, rating: "4.8 (89)", desc: "Яскравий 3D-стиль, обробка персонажів, високий CTR під вашу тематику.", tagColor: "purple" }
+    ];
+
+    function renderProducts(items) {
+      const grid = document.getElementById('productsGrid');
+      grid.innerHTML = '';
+      items.forEach(p => {
+        grid.innerHTML += `
+          <div class="glass-card rounded-xl border border-gray-800 hover:border-brand-500/40 transition overflow-hidden group flex flex-col justify-between">
+            <div class="p-5">
+              <div class="flex justify-between items-start mb-3">
+                <span class="bg-${p.tagColor || 'emerald'}-500/10 text-${p.tagColor || 'emerald'}-400 text-[10px] font-semibold px-2.5 py-1 rounded-full border border-${p.tagColor || 'emerald'}-500/20">${p.category}</span>
+                <span class="text-xs text-gray-400"><i class="fa-solid fa-star text-amber-400 mr-1"></i>${p.rating}</span>
+              </div>
+              <h3 class="font-semibold text-white group-hover:text-brand-500 transition line-clamp-2 text-sm mb-2">${p.title}</h3>
+              <p class="text-xs text-gray-400 line-clamp-2 mb-4">${p.desc}</p>
+            </div>
+            <div class="p-5 border-t border-gray-800/80 bg-slate-950/40 flex items-center justify-between">
+              <div>
+                <span class="text-xs text-gray-500 block">Ціна</span>
+                <span class="text-lg font-extrabold text-white">${p.price} ₴</span>
+              </div>
+              <button onclick="openModal('${p.title}', ${p.price})" class="bg-brand-500/10 hover:bg-brand-500 text-brand-500 hover:text-slate-950 font-semibold px-3 py-1.5 rounded-lg text-xs transition border border-brand-500/30">
+                Купити
+              </button>
+            </div>
+          </div>
+        `;
+      });
+      document.getElementById('productCount').innerText = `Активних лотів: ${items.length}`;
+    }
+
+    function filterProducts() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = products.filter(p => p.title.toLowerCase().includes(query) || p.category.toLowerCase().includes(query));
+      renderProducts(filtered);
+    }
+
+    function showSection(sectionId) {
+      const sections = ['home', 'catalog', 'buyer', 'seller', 'admin'];
+      sections.forEach(s => {
+        const el = document.getElementById('sec-' + s);
+        if (el) el.classList.add('hidden');
+      });
+      const activeEl = document.getElementById('sec-' + sectionId);
+      if (activeEl) activeEl.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function openModal(title, price) {
+      const fee = price * 0.05; // 5% Комісія маркетплейсу
+      const total = price + fee;
+
+      document.getElementById('payModalTitle').innerText = title;
+      document.getElementById('payModalBasePrice').innerText = price + ' ₴';
+      document.getElementById('payModalFee').innerText = fee.toFixed(2) + ' ₴';
+      document.getElementById('payModalTotal').innerText = total.toFixed(2) + ' ₴';
+
+      document.getElementById('modal-pay').classList.remove('hidden');
+      document.getElementById('modal-pay').classList.add('flex');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-pay').classList.add('hidden');
+      document.getElementById('modal-pay').classList.remove('flex');
+    }
+
+    function openCreateModal() {
+      document.getElementById('modal-create').classList.remove('hidden');
+      document.getElementById('modal-create').classList.add('flex');
+    }
+
+    function closeCreateModal() {
+      document.getElementById('modal-create').classList.add('hidden');
+      document.getElementById('modal-create').classList.remove('flex');
+    }
+
+    function openAuthModal(mode) {
+      document.getElementById('authTitle').innerText = mode === 'login' ? 'Вхід у DealPay' : 'Реєстрація в DealPay';
+      document.getElementById('modal-auth').classList.remove('hidden');
+      document.getElementById('modal-auth').classList.add('flex');
+    }
+
+    function closeAuthModal() {
+      document.getElementById('modal-auth').classList.add('hidden');
+      document.getElementById('modal-auth').classList.remove('flex');
+    }
+
+    function submitAuth() {
+      const name = document.getElementById('authEmail').value;
+      if(!name) return alert('Введіть нікнейм!');
+      
+      currentUser = name.startsWith('@') ? name : '@' + name;
+      document.getElementById('userName').innerText = currentUser;
+      document.getElementById('authButtons').classList.add('hidden');
+      document.getElementById('userProfile').classList.remove('hidden');
+      document.getElementById('userProfile').classList.add('flex');
+      
+      closeAuthModal();
+      alert('Успішний вхід! Вітаємо, ' + currentUser);
+    }
+
+    function logout() {
+      currentUser = null;
+      document.getElementById('authButtons').classList.remove('hidden');
+      document.getElementById('userProfile').classList.add('hidden');
+      document.getElementById('userProfile').classList.remove('flex');
+    }
+
+    function addProduct() {
+      const title = document.getElementById('newTitle').value;
+      const category = document.getElementById('newCategory').value;
+      const price = document.getElementById('newPrice').value;
+      const desc = document.getElementById('newDesc').value;
+
+      if(!title || !price) {
+        alert('Будь ласка, заповніть назву та ціну!');
+        return;
+      }
+
+      products.unshift({
+        id: products.length + 1,
+        title: title,
+        category: category,
+        price: Number(price),
+        rating: "Новий",
+        desc: desc || "Без опису",
+        tagColor: "emerald"
+      });
+
+      renderProducts(products);
+      closeCreateModal();
+      showSection('catalog');
+      alert('Послугу успішно опубліковано в каталозі!');
+    }
+
+    function simulatePayment() {
+      alert('Успішна оплата! Кошти зарезервовано на Escrow-рахунку DealPay.');
+      closeModal();
+      showSection('buyer');
+    }
+
+    function completeOrder() {
+      document.getElementById('orderStatusBadge').className = "bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded text-[10px] border border-emerald-500/20";
+      document.getElementById('orderStatusBadge').innerText = "Завершено (Кошти відправлено продавцю)";
+      alert('Угоду підтверджено! Кошти переведено з Escrow на баланс продавця, а комісія 5% вирахована в дохід маркетплейсу.');
+    }
+
+    renderProducts(products);
+  </script>
+</body>
+</html>
