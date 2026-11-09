@@ -1,15 +1,14 @@
 {
-  "name": "dealpay-backend",
+  "name": "dealpay",
   "version": "1.0.0",
-  "description": "DealPay Marketplace Backend Server",
+  "description": "Digital marketplace",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
     "express": "^4.19.2",
-    "cors": "^2.8.5",
-    "sqlite3": "^5.1.7",
-    "axios": "^1.7.2"
+    "multer": "^1.4.5-lts.1",
+    "sqlite3": "^5.1.7"
   }
 }
