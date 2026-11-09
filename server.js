@@ -7,134 +7,148 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Твій Telegram Username для доступу до адмінки (без @)
+const ADMIN_USERNAME = 'Salxanich'; 
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname)));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Создаем папку для загрузок, если её нет
 if (!fs.existsSync('./uploads')) {
     fs.mkdirSync('./uploads');
 }
 
-// Настройка хранилища для multer (сохранение файлов)
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');
-    },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, uniqueSuffix + path.extname(file.originalname));
-    }
+    destination: (req, file, cb) => cb(null, 'uploads/'),
+    filename: (req, file, cb) => cb(null, Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname))
 });
-const upload = multer({ storage: storage, limits: { fileSize: 5 * 1024 * 1024 } }); // лимит 5MB
+const upload = multer({ storage: storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
-const db = new sqlite3.Database('./dealpay.db', (err) => {
-    if (err) console.error('Ошибка БД:', err.message);
-    else console.log('Успешное подключение к SQLite.');
-});
+const db = new sqlite3.Database('./dealpay.db');
 
 db.serialize(() => {
     db.run(`CREATE TABLE IF NOT EXISTS products (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT,
-        category TEXT,
-        price REAL,
-        desc TEXT,
-        images TEXT,
-        seller TEXT,
-        rating TEXT DEFAULT '5.0'
+        title TEXT, category TEXT, price REAL, desc TEXT, images TEXT, seller TEXT, rating TEXT DEFAULT '5.0'
     )`);
 
     db.run(`CREATE TABLE IF NOT EXISTS orders (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        order_code TEXT,
-        product_title TEXT,
-        price REAL,
-        fee REAL,
-        total REAL,
-        buyer TEXT,
-        seller TEXT,
-        status TEXT DEFAULT 'pending'
+        order_code TEXT, product_title TEXT, price REAL, fee REAL, total REAL, buyer TEXT, seller TEXT, status TEXT DEFAULT 'pending'
     )`);
 
     db.run(`CREATE TABLE IF NOT EXISTS balances (
-        seller TEXT PRIMARY KEY,
-        available REAL DEFAULT 0.0,
-        earned REAL DEFAULT 0.0
+        seller TEXT PRIMARY KEY, available REAL DEFAULT 0.0, earned REAL DEFAULT 0.0
+    )`);
+
+    // Таблиця тикетів підтримки
+    db.run(`CREATE TABLE IF NOT EXISTS tickets (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user TEXT, message TEXT, reply TEXT DEFAULT NULL, status TEXT DEFAULT 'open', created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`);
+
+    // Таблиця скарг
+    db.run(`CREATE TABLE IF NOT EXISTS reports (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        reporter TEXT, target_type TEXT, target_id TEXT, reason TEXT, status TEXT DEFAULT 'pending', created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`);
 });
 
-// Получить все товары
+// MIDDLEWARE: Перевірка прав адміна
+const checkAdmin = (req, res, next) => {
+    const user = req.headers['x-user-name'];
+    if (!user || user.replace('@', '').toLowerCase() !== ADMIN_USERNAME.toLowerCase()) {
+        return res.status(403).json({ error: 'Доступ заборонено. Тільки для адміністратора.' });
+    }
+    next();
+};
+
+// ТОВАРИ
 app.get('/api/products', (req, res) => {
     db.all("SELECT * FROM products ORDER BY id DESC", [], (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
-        rows.forEach(r => {
-            try { r.images = JSON.parse(r.images || '[]'); } catch(e) { r.images = []; }
-        });
+        rows.forEach(r => { try { r.images = JSON.parse(r.images || '[]'); } catch(e) { r.images = []; } });
         res.json(rows);
     });
 });
 
-// Создать товар с загрузкой файлов (до 10 штук)
 app.post('/api/products', upload.array('photos', 10), (req, res) => {
     const { title, category, price, desc, seller } = req.body;
-    
-    // Получаем пути к загруженным файлам
     const images = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
-    const imagesJson = JSON.stringify(images);
+    db.run(`INSERT INTO products (title, category, price, desc, images, seller) VALUES (?, ?, ?, ?, ?, ?)`,
+        [title, category, price, desc, JSON.stringify(images), seller], function(err) {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ id: this.lastID, success: true });
+        });
+});
 
-    const query = `INSERT INTO products (title, category, price, desc, images, seller) VALUES (?, ?, ?, ?, ?, ?)`;
-    db.run(query, [title, category, price, desc, imagesJson, seller], function(err) {
+app.delete('/api/admin/products/:id', checkAdmin, (req, res) => {
+    db.run(`DELETE FROM products WHERE id = ?`, [req.params.id], function(err) {
         if (err) return res.status(500).json({ error: err.message });
-        res.json({ id: this.lastID, success: true });
+        res.json({ success: true });
     });
 });
 
+// УГОДИ ТА БАЛАНС
 app.get('/api/orders', (req, res) => {
-    db.all("SELECT * FROM orders ORDER BY id DESC", [], (err, rows) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(rows);
-    });
+    db.all("SELECT * FROM orders ORDER BY id DESC", [], (err, rows) => res.json(rows || []));
 });
 
 app.post('/api/orders/create', (req, res) => {
     const { product_title, price, buyer, seller } = req.body;
-    const fee = price * 0.03;
-    const total = price + fee;
+    const fee = price * 0.03, total = price + fee;
     const order_code = 'DEAL-' + Math.floor(100000 + Math.random() * 900000);
-
-    const query = `INSERT INTO orders (order_code, product_title, price, fee, total, buyer, seller, status) VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')`;
-    db.run(query, [order_code, product_title, price, fee, total, buyer, seller], function(err) {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json({ order_code, success: true });
-    });
+    db.run(`INSERT INTO orders (order_code, product_title, price, fee, total, buyer, seller) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [order_code, product_title, price, fee, total, buyer, seller], (err) => res.json({ order_code, success: true }));
 });
 
 app.post('/api/orders/complete', (req, res) => {
-    const { order_code } = req.body;
-    db.get("SELECT * FROM orders WHERE order_code = ? AND status = 'pending'", [order_code], (err, order) => {
-        if (err || !order) return res.status(400).json({ error: "Заказ не найден" });
-
-        db.run(`UPDATE orders SET status = 'completed' WHERE order_code = ?`, [order_code], (err) => {
-            if (err) return res.status(500).json({ error: err.message });
-
-            db.run(`INSERT INTO balances (seller, available, earned) VALUES (?, ?, ?) 
-                    ON CONFLICT(seller) DO UPDATE SET available = available + ?, earned = earned + ?`,
-                    [order.seller, order.price, order.price, order.price, order.price], (err) => {
-                res.json({ success: true });
-            });
+    db.get("SELECT * FROM orders WHERE order_code = ? AND status = 'pending'", [req.body.order_code], (err, order) => {
+        if (!order) return res.status(400).json({ error: "Не знайдено" });
+        db.run(`UPDATE orders SET status = 'completed' WHERE order_code = ?`, [order.order_code], () => {
+            db.run(`INSERT INTO balances (seller, available, earned) VALUES (?, ?, ?) ON CONFLICT(seller) DO UPDATE SET available = available + ?, earned = earned + ?`,
+                [order.seller, order.price, order.price, order.price, order.price], () => res.json({ success: true }));
         });
     });
 });
 
 app.get('/api/balance/:seller', (req, res) => {
-    const seller = req.params.seller;
-    db.get("SELECT * FROM balances WHERE seller = ?", [seller], (err, row) => {
-        res.json(row || { available: 0, earned: 0 });
-    });
+    db.get("SELECT * FROM balances WHERE seller = ?", [req.params.seller], (err, row) => res.json(row || { available: 0, earned: 0 }));
 });
 
-app.listen(PORT, () => {
-    console.log(`Сервер запущен на порту ${PORT}`);
+// ПІДТРИМКА (TICKETS)
+app.post('/api/support/ticket', (req, res) => {
+    const { user, message } = req.body;
+    db.run(`INSERT INTO tickets (user, message) VALUES (?, ?)`, [user, message], (err) => res.json({ success: true }));
 });
+
+app.get('/api/admin/tickets', checkAdmin, (req, res) => {
+    db.all("SELECT * FROM tickets ORDER BY id DESC", [], (err, rows) => res.json(rows || []));
+});
+
+app.post('/api/admin/tickets/reply', checkAdmin, (req, res) => {
+    const { id, reply } = req.body;
+    db.run(`UPDATE tickets SET reply = ?, status = 'closed' WHERE id = ?`, [reply, id], (err) => res.json({ success: true }));
+});
+
+app.get('/api/support/my-tickets/:user', (req, res) => {
+    db.all("SELECT * FROM tickets WHERE user = ? ORDER BY id DESC", [req.params.user], (err, rows) => res.json(rows || []));
+});
+
+// СКАРГИ (REPORTS)
+app.post('/api/reports', (req, res) => {
+    const { reporter, target_type, target_id, reason } = req.body;
+    db.run(`INSERT INTO reports (reporter, target_type, target_id, reason) VALUES (?, ?, ?, ?)`,
+        [reporter, target_type, target_id, reason], (err) => res.json({ success: true }));
+});
+
+app.get('/api/admin/reports', checkAdmin, (req, res) => {
+    db.all("SELECT * FROM reports ORDER BY id DESC", [], (err, rows) => res.json(rows || []));
+});
+
+app.post('/api/admin/reports/resolve', checkAdmin, (req, res) => {
+    db.run(`UPDATE reports SET status = 'resolved' WHERE id = ?`, [req.body.id], (err) => res.json({ success: true }));
+});
+
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
