@@ -76,7 +76,7 @@
 
     <main class="max-w-7xl mx-auto px-4 py-8">
 
-      <!-- CATALOG / HOME -->
+      <!-- CATALOG -->
       <section id="sec-catalog">
         <div class="relative rounded-2xl glass-card p-8 mb-8 border border-gray-800 glow-emerald overflow-hidden">
           <div class="absolute -top-24 -right-24 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl"></div>
@@ -147,7 +147,7 @@
         </div>
       </section>
 
-      <!-- ПУБЛІЧНИЙ ПРОФІЛЬ ПРОДАВЦЯ -->
+      <!-- ПУБЛІЧНИЙ ПРОФІЛЬ -->
       <section id="sec-seller-profile" class="hidden">
         <button onclick="showSection('catalog')" class="text-xs text-brand-500 hover:underline mb-6 flex items-center"><i class="fa-solid fa-arrow-left mr-2"></i> Назад до каталогу</button>
         
@@ -223,11 +223,20 @@
         </div>
       </section>
 
-      <!-- ADMIN -->
+      <!-- ADMIN PANEL -->
       <section id="sec-admin" class="hidden">
         <div class="flex items-center space-x-3 mb-6">
           <h2 class="text-2xl font-bold text-amber-400"><i class="fa-solid fa-user-shield"></i> Панель Адміністратора (@revezzzzzz)</h2>
         </div>
+        
+        <div class="glass-card p-6 rounded-xl border border-gray-800 mb-8">
+          <h3 class="font-bold text-white mb-4 text-sm flex items-center justify-between">
+            <span><i class="fa-solid fa-money-bill-transfer text-brand-500 mr-2"></i> Заявки на поповнення P2P</span>
+            <button onclick="loadAdminTopups()" class="text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-rotate-right"></i> Оновити</button>
+          </h3>
+          <div id="adminTopupsList" class="space-y-3 max-h-[300px] overflow-y-auto custom-scrollbar"></div>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div class="glass-card p-6 rounded-xl border border-gray-800"><h3 class="font-bold text-white mb-4 text-sm">Підтримка</h3><div id="adminTicketsList" class="space-y-4 max-h-[450px] overflow-y-auto"></div></div>
           <div class="glass-card p-6 rounded-xl border border-gray-800"><h3 class="font-bold text-white mb-4 text-sm">Скарги</h3><div id="adminReportsList" class="space-y-4 max-h-[450px] overflow-y-auto"></div></div>
@@ -261,13 +270,24 @@
     </div>
   </div>
 
-  <!-- MODAL TOPUP -->
+  <!-- MODAL P2P TOPUP (Реальне поповнення без ФОП) -->
   <div id="modal-topup" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-    <div class="glass-card max-w-sm w-full p-6 rounded-2xl border border-gray-800 relative">
+    <div class="glass-card max-w-md w-full p-6 rounded-2xl border border-gray-800 relative">
       <button onclick="closeTopUpModal()" class="absolute top-4 right-4 text-gray-400"><i class="fa-solid fa-xmark"></i></button>
-      <h3 class="text-lg font-bold text-white mb-4">Поповнення гаманця</h3>
-      <input type="number" id="topupAmount" placeholder="Сума (₴)" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-xs text-gray-200 mb-4">
-      <button onclick="topUpBalance()" class="w-full bg-brand-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs">Поповнити через Mono/Privat</button>
+      <h3 class="text-lg font-bold text-white mb-2">Поповнити гаманець (P2P)</h3>
+      <p class="text-xs text-gray-400 mb-4">Перекажіть суму на банківську картку та вкажіть час або квитанцію переказу.</p>
+      
+      <div class="bg-slate-900 p-3 rounded-xl border border-gray-800 mb-4 text-xs">
+        <span class="text-gray-400 block mb-1">Картка для поповнення (Mono/Privat):</span>
+        <strong class="text-brand-500 font-mono text-sm select-all">4441 1111 2222 3333</strong>
+      </div>
+
+      <div class="space-y-3 mb-4">
+        <input type="number" id="topupAmount" placeholder="Сума переказу (₴)" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-xs text-gray-200">
+        <input type="text" id="topupReceipt" placeholder="Час або точне ім'я відправника з квитанції" class="w-full bg-slate-900 border border-gray-800 rounded-lg p-2.5 text-xs text-gray-200">
+      </div>
+      
+      <button onclick="submitP2PTopup()" class="w-full bg-brand-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs">Я переказав гроші (Подати заявку)</button>
     </div>
   </div>
 
@@ -499,19 +519,53 @@
       alert('Дякуємо! Угоду закрито, рейтинг продавця оновлено.');
     }
 
+    // P2P ПОПОВНЕННЯ БАЛАНСУ
     function openTopUpModal() { document.getElementById('modal-topup').classList.remove('hidden'); document.getElementById('modal-topup').classList.add('flex'); }
     function closeTopUpModal() { document.getElementById('modal-topup').classList.add('hidden'); }
-    async function topUpBalance() {
+    
+    async function submitP2PTopup() {
+      if (!currentUser) return alert('Увійдіть через Telegram!');
       const amount = Number(document.getElementById('topupAmount').value);
-      if (!amount || amount <= 0) return alert('Введіть суму!');
-      await fetch('/api/balance/topup', {
+      const receipt = document.getElementById('topupReceipt').value;
+      if (!amount || amount <= 0 || !receipt) return alert('Заповніть суму та квитанцію!');
+
+      await fetch('/api/balance/topup-request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ seller: currentUser, amount })
+        body: JSON.stringify({ user: currentUser, amount, receipt_info: receipt })
       });
       closeTopUpModal();
-      loadUserData();
-      alert(`Баланс успішно поповнено на ${amount} ₴!`);
+      alert('Заявку надіслано! Баланс буде зараховано після перевірки адміном.');
+    }
+
+    // АДМІНІСТРУВАННЯ ПОПОВНЕНЬ
+    async function loadAdminTopups() {
+      const res = await fetch('/api/admin/topups', { headers: { 'x-user-name': currentUser } });
+      const topups = await res.json();
+      const container = document.getElementById('adminTopupsList');
+      if (topups.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-xs">Немає нових заявок на поповнення.</p>';
+        return;
+      }
+      container.innerHTML = topups.map(t => `
+        <div class="p-3 bg-slate-900 border border-gray-800 rounded-lg flex justify-between items-center text-xs">
+          <div>
+            <span class="font-bold text-brand-500">${t.user}</span> — <strong class="text-white">${t.amount} ₴</strong>
+            <p class="text-[10px] text-gray-400 mt-0.5">Квитанція/Час: ${t.receipt_info}</p>
+          </div>
+          <button onclick="approveTopup(${t.id})" class="bg-brand-500 text-slate-950 font-bold px-3 py-1 rounded text-xs">Підтвердити</button>
+        </div>
+      `).join('');
+    }
+
+    async function approveTopup(id) {
+      await fetch('/api/admin/topups/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-user-name': currentUser },
+        body: JSON.stringify({ id })
+      });
+      loadAdminTopups();
+      alert('Баланс користувача поповнено!');
     }
 
     async function addProductToDB() {
@@ -620,7 +674,7 @@
       if (id === 'buyer') loadOrders();
       if (id === 'seller') loadUserData();
       if (id === 'support') loadMyTickets();
-      if (id === 'admin') { loadAdminTickets(); loadAdminReports(); }
+      if (id === 'admin') { loadAdminTopups(); loadAdminTickets(); loadAdminReports(); }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
