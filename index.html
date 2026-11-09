@@ -226,7 +226,7 @@
       <!-- ADMIN -->
       <section id="sec-admin" class="hidden">
         <div class="flex items-center space-x-3 mb-6">
-          <h2 class="text-2xl font-bold text-amber-400"><i class="fa-solid fa-user-shield"></i> Панель Адміністратора</h2>
+          <h2 class="text-2xl font-bold text-amber-400"><i class="fa-solid fa-user-shield"></i> Панель Адміністратора (@revezzzzzz)</h2>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div class="glass-card p-6 rounded-xl border border-gray-800"><h3 class="font-bold text-white mb-4 text-sm">Підтримка</h3><div id="adminTicketsList" class="space-y-4 max-h-[450px] overflow-y-auto"></div></div>
@@ -295,7 +295,7 @@
     let currentSellerName = '';
     let selectedRating = 5;
     let activeCategory = '';
-    const ADMIN_USER = '@Salxanich';
+    const ADMIN_USER = '@revezzzzzz';
 
     function onTelegramAuth(user) {
       currentUser = '@' + user.username;
@@ -402,7 +402,6 @@
       showSection('product-detail');
     }
 
-    // ВІДКРИТТЯ ПРОФІЛЮ ПРОДАВЦЯ
     async function openSellerProfile(event) {
       event.preventDefault();
       if (!currentSellerName) return;
